@@ -1,0 +1,34 @@
+<!doctype html>
+<title>Hello from Flask</title>
+{% include 'includes/base.html' %}
+  <h1>Hello World!</h1>
+
+<h2>current information</h2>
+
+uptime: {{ info.uptime }}
+
+<h3>recent activity</h3>
+
+<table>
+<tr>
+<th># of events</th><th>average events per second</th>
+</tr>
+<tr>
+<td>{{info.numberofevents}}</td><td>{{info.eventspersecond}}</td>
+</tr>
+</table>
+
+<h2>activity graphs</h2>
+<table>
+<tr><td>recent activity</td><td>waveform</td></tr>
+<tr>
+<td> <div class="plot" src="graph/activity" /></td>
+<td> <div class="plot" src="graph/waveform" /></td>
+</tr>
+<tr><td></td><td>xy-waveform</td></tr>
+<tr>
+<td></td>
+<td> <div class="plot" src="graph/xy" /></td>
+</tr>
+</table>
+
