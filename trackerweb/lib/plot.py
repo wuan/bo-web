@@ -49,7 +49,7 @@ class RawData(CachedPlot):
     now = datetime.datetime.utcnow()
     now = now.replace(tzinfo=pytz.UTC)
     delta = datetime.timedelta(minutes=5)
-    fileNames = blitzortung.files.RawFiles("/var/cache/blitzortung/raw")
+    fileNames = blitzortung.files.Raw("/var/cache/blitzortung/raw")
     timeInterval = blitzortung.data.TimeRange(now, delta)
     data = blitzortung.files.Data(fileNames, timeInterval)
     self.lines = data.get(True)

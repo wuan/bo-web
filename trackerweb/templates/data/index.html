@@ -3,6 +3,17 @@
 {% include 'includes/base.html' %}
   <h1>Data Overview</h1>
 
+<script type=text/javascript>
+  $(document).ready(
+      function() {
+        $.getJSON($SCRIPT_ROOT + '_get_dates', {},
+	  function(data) {:
+	    $("#result").text(data.result[0]);
+	    });
+	return false;
+      });
+</script>
+
 <table>
 <tr>
 <th># of events</th><th>average events per second</th>
@@ -10,5 +21,7 @@
 <tr>
 <td>asdf</td><td>asd</td>
 </tr>
+<select id="result">
+</select>
 </table>
 
