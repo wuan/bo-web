@@ -2,6 +2,8 @@ import blitzortung
 import datetime
 import pytz
 
+import numpy as np
+
 from flask import current_app
 
 import trackerweb.lib.tracker
@@ -9,7 +11,7 @@ import trackerweb.lib.tracker
 class CachedPlot(blitzortung.plot.Plot):
 
   def __init__(self):
-    blitzortung.plot.Plot.__init__(self)
+    super(CachedPlot, self).__init__(self)
     self.cache = current_app.config['cache']
 
   def get_item_name(self):
@@ -27,22 +29,19 @@ class CachedPlot(blitzortung.plot.Plot):
     return data
 
 class Activity(CachedPlot):
-  def plot(self):
+  def plot(self, *args):
     tracker_activity = trackerweb.lib.tracker.Activity()
+    
+    axes = self.figure.add_subplot(111, xlabel='minute', ylabel='# of measured local events')
 
-    self.write('set xlabel "minute"')
-    self.write('set ylabel "# of measured local events"')
-    activity = tracker_activity.get()
-    if len(activity) == 0:
-      activity.append(0)
-    left_pos = -len(activity) + 1
-    self.write('set xr[%f:%f]' %(left_pos - 0.5, 0.5))
-    self.write('set yr[0:]')
-    self.write('plot "-" not w boxes lt 3 fs solid 0.5')
-
-    for index, value in enumerate(activity):
-      self.write('%d %d' %(-index, value))
-    self.write('e')
+    activity = np.array(tracker_activity.get())
+  
+    #left_pos = -len(activity) + 1
+    #self.write('set xr[%f:%f]' %(left_pos - 0.5, 0.5))
+    #self.write('set yr[0:]')
+    #self.write('plot "-" not w boxes lt 3 fs solid 0.5')
+    
+    axes.plot(activity)
 
 class RawData(CachedPlot):
   def fetch_data(self):
@@ -52,34 +51,31 @@ class RawData(CachedPlot):
     fileNames = blitzortung.files.Raw("/var/cache/blitzortung/raw")
     timeInterval = blitzortung.data.TimeRange(now, delta)
     data = blitzortung.files.Data(fileNames, timeInterval)
-    self.lines = data.get(True)
+    lines = data.get(True)
+    time = []
+    x = []
+    y = []
+    for line in lines:
+      fields = lines.split(' ')
+      time.append(int(fields[2])/1000.0)
+      x.append(int(fields[3]))
+      y.append(int(fields[4]))
+    self.time = np.array(time)
+    self.x = np.array(x)
+    self.y = np.array(y)
 
 class Waveform(RawData):
-  def plot(self):
+  def plot(self, *args):
     self.fetch_data()
 
-    self.write('set yr[-1:1]')
-    self.write('set xlabel "time [us]')
-    self.write('plot "-" u ($3/1000):4 ti "x" w l lt 2, "-" u ($3/1000):5 ti "y" w l lt 6')
-    for line in self.lines:
-      self.write(line)
-    self.write('e')
-    for line in self.lines:
-      self.write(line)
-    self.write('e')
+    axes = self.figure.add_subplot(111, xlabel='time [us]')
+    axes.plot(self.time, self.x)
+    axes.plot(self.time, self.y)
 
 class XY(RawData):
-  def plot(self):
+  def plot(self, *args):
     self.fetch_data()
 
-    self.write('set xr[-1:1]')
-    self.write('set yr[-1:1]')
-    self.write('set size square')
-    self.write('plot "-" u 4:5 not w l lt 3')
-    for line in self.lines:
-      self.write(line)
-    self.write('e')
-    for line in self.lines:
-      self.write(line)
-    self.write('e')
+    axes = self.figure.add_subplot(111)
+    axes.plot(self.x, self.y)
 
