@@ -35,13 +35,10 @@ class Activity(CachedPlot):
     axes = self.figure.add_subplot(111, xlabel='minute', ylabel='# of measured local events')
 
     activity = np.array(tracker_activity.get())
+    width = 1.0
+    left = np.arange(-len(activity)+width/2, width/2, width)
   
-    #left_pos = -len(activity) + 1
-    #self.write('set xr[%f:%f]' %(left_pos - 0.5, 0.5))
-    #self.write('set yr[0:]')
-    #self.write('plot "-" not w boxes lt 3 fs solid 0.5')
-    
-    axes.plot(activity)
+    axes.bar(left, activity, width=width)
 
 class RawData(CachedPlot):
   def fetch_data(self):
@@ -56,10 +53,15 @@ class RawData(CachedPlot):
     x = []
     y = []
     for line in lines:
-      fields = lines.split(' ')
-      time.append(int(fields[2])/1000.0)
-      x.append(int(fields[3]))
-      y.append(int(fields[4]))
+      if line and line[0] != '#':
+	fields = line.split(' ')
+	time.append(float(fields[2])/1000.0)
+	x.append(float(fields[3]))
+	y.append(float(fields[4]))
+      else:
+	time.append(float('nan'))
+	x.append(float('nan'))
+	y.append(float('nan'))
     self.time = np.array(time)
     self.x = np.array(x)
     self.y = np.array(y)
