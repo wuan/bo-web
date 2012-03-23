@@ -1,0 +1,10 @@
+install virtual environment:
+
+> virtualenv <env_dir>
+
+activate virtual environment
+
+> . <env_dir>/bin/activate
+
+install software
+> pip install flask python-memcached
