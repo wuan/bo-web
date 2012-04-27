@@ -19,7 +19,7 @@ uptime: {{ info.uptime }}
 </table>
 
 <h2>activity graphs</h2>
-<table>
+<!--<table>
 <tr><td>recent activity</td><td>waveform</td></tr>
 <tr>
 <td> <div class="plot" src="graph/activity" /></td>
@@ -30,5 +30,32 @@ uptime: {{ info.uptime }}
 <td></td>
 <td> <div class="plot" src="graph/xy" /></td>
 </tr>
-</table>
+</table>-->
 
+<div id="activity_plot"/>
+<script type="text/javascript">
+$.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function(data) {
+
+var width = 400;
+var barWidth = width / data.length;
+var height = 200;
+
+var barDemo = d3.select("#activity_plot").
+  append("svg:svg").
+  attr("width", width).
+  attr("height", height);
+
+var x = d3.scale.linear().domain([0, data.length]).range([0, width]);
+var y = d3.scale.linear().domain([0, d3.max(data)]).range([0, height]);
+
+barDemo.selectAll("rect").
+  data(data).
+  enter().
+  append("svg:rect").
+  attr("x", function(datum, index) { return x(index); }).
+  attr("y", function(datum, index) { return height - y(datum); }).
+  attr("height", function(datum, index) { return y(datum); }).
+  attr("width", barWidth).
+  attr("fill", "#2d578b");
+});
+</script>

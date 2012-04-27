@@ -12,6 +12,6 @@ import trackerweb.lib.plot
 
 backend = Blueprint('backend', __name__, url_prefix='/backend')
 
-@backend.route('/raw')
-def get_raw():
+@backend.route('/tracker/activity')
+def get_tracker_activity():
     return json.dumps([1, 2, 3, 1, 5, 4, 6])
