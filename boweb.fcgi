@@ -3,10 +3,10 @@
 import sys,os
 import logging, logging.handlers
 
-activate_this = os.path.join(sys.path[0], 'bo-web/bin/activate_this.py')
+activate_this = os.path.join(sys.path[0], 'bowebenv/bin/activate_this.py')
 execfile(activate_this, dict(__file__ = activate_this))
 
-filename="/tmp/trackerweb.log"
+filename="/var/log/lighttpd/blitzortung-web.log"
 file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=10*1024*1024, backupCount=5,encoding='utf-8')
 
 root_logger = logging.getLogger('')

@@ -24,5 +24,10 @@ def index():
   info['eventspersecond'] = tracker_info.get('process/eventsPerSecond')
   info['minutes'] = tracker_info.get('process/numberOfSeconds') / 60
 
+  info['firmware'] = tracker_info.get('hardware/firmware')
+  info['baudrate'] = "%d/%d" %(tracker_info.get('hardware/comm/baudRate'), tracker_info.get('hardware/gps/baudRate'))
+  info['version'] = tracker_info.get('software/version').replace('&nbsp;',' ')
+  info['gps_hardware'] = tracker_info.get('hardware/gps/type')
+
   return render_template('tracker/index.html', info=info)
 

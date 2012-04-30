@@ -3,9 +3,10 @@
 {% include 'includes/base.html' %}
   <h1>Tracker status</h1>
 
-tracker runtime: {{ info.uptime }}
+tracker runtime: {{ info.uptime }}, version: {{ info.version }} <br/>
+hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '{{ info.gps_hardware }}'
 
-<h3>last {{ info.minutes }} minutes </h3>
+<h3>past {{ info.minutes }} minutes activity</h3>
 <div id="activity_plot"></div>
 <table>
 <tr>
@@ -119,10 +120,11 @@ axisGroup.
 <script type="text/javascript">
 $.getJSON($SCRIPT_ROOT + '/backend/tracker/raw/-1', function(data) {
 var eventInfo = data[0];
-var data = eventInfo[9];
 var samplePeriod = eventInfo[6];
-var maxIndex = eventInfo[8];
 var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
+var maxPhase = eventInfo[8];
+var maxIndex = eventInfo[9];
+var data = eventInfo[10];
 
 $('#waveform_time').text(eventInfo[0] + '.' + eventInfo[1] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod/1000).toFixed(2) + ' us (' + maxIndex + ')');
 

@@ -1,10 +1,14 @@
 install virtual environment:
 
-> virtualenv <env_dir>
+> virtualenv bowebenv
 
 activate virtual environment
 
-> . <env_dir>/bin/activate
+> . bowebenv/bin/activate
 
 install software
 > pip install flask python-memcached
+
+install local copy of JavaScript libraries
+
+> ./update-js-libs 
