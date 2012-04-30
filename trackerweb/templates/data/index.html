@@ -6,7 +6,7 @@
 <script type="text/javascript">
   $(document).ready(
       function() {
-        $.getJSON($SCRIPT_ROOT + '_get_date', {},
+        $.getJSON($SCRIPT_ROOT + '/data/_get_date', {},
 	  function(data) {
 	    var items = new Array();
 	    $.each(data.result, function(index, date) {
@@ -26,13 +26,13 @@ function onDateChange() {
   $('#total').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
   $('#avg_amp').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
   $('#histogram').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
-  $.getJSON($SCRIPT_ROOT + '_get_date/' + date,
+  $.getJSON($SCRIPT_ROOT + '/data/_get_date/' + date,
       function(data) {
         $('#total').text(data.total);
         $('#avg_amp').text(data.avg_amp);
 	});
 
-  $.getJSON($SCRIPT_ROOT + '_get_histogram/' + date, function(data) {
+  $.getJSON($SCRIPT_ROOT + '/data/_get_histogram/' + date, function(data) {
 
   var width = 400;
   var barWidth = width / data.y.length;
