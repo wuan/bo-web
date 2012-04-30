@@ -41,7 +41,7 @@ def get_date(date):
   date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
   data_file = get_raw_files().get(date)
 
-  data = subprocess.Popen(['blitzortung-data', '-i', data_file, '--mode=statistics'], stdout=subprocess.PIPE)
+  data = subprocess.Popen(['bo-data', '-i', data_file, '--mode=statistics'], stdout=subprocess.PIPE)
   (output, _) = data.communicate()
   results = output.strip().split(' ')
   return jsonify(total=int(results[0]), avg_amp=float(results[1]))
@@ -51,7 +51,7 @@ def get_histogram(date):
   date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
   data_file = get_raw_files().get(date)
 
-  data = subprocess.Popen(['blitzortung-data', '-i', data_file, '--mode=histogram'], stdout=subprocess.PIPE)
+  data = subprocess.Popen(['bo-data', '-i', data_file, '--mode=histogram'], stdout=subprocess.PIPE)
   (output, _) = data.communicate()
   x=[]
   y=[]

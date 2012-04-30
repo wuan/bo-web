@@ -1,0 +1,7 @@
+#!/bin/bash
+
+TARGETDIR=trackerweb/static/jslib
+
+wget http://code.jquery.com/jquery.min.js -O $TARGETDIR/jquery.js
+wget http://mbostock.github.com/d3/d3.v2.min.js  -O $TARGETDIR/d3.js
+

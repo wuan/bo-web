@@ -1,26 +1,6 @@
 <link rel=stylesheet type="text/css" href="{{url_for('static', filename='style.css')}}"/>
-<script type="text/javascript" src="{{url_for('static', filename='jquery.js') }}"></script>
-<script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+<script type="text/javascript" src="{{url_for('static', filename='jslib/jquery.js') }}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='jslib/d3.js') }}"></script>
 <script type="text/javascript">
   $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-</script>
-
-<script>
-$(document).ready(function() {
-    $('.plot').each(function(index, element) {
-      $(element).empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
-
-      var img = new Image();
-
-      $(img)
-	.load(function() {
-	  $(this).hide();
-	  $(element)
-	    .empty()
-	    .append(this);
-	  $(this).fadeIn();
-	  })
-	.attr('src', $(element).attr('src'));
-      });
-});
 </script>
