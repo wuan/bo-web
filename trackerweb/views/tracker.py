@@ -22,6 +22,7 @@ def index():
   info['uptime'] = tracker_info.get('process/uptime')
   info['numberofevents'] = tracker_info.get('process/numberOfEvents')
   info['eventspersecond'] = tracker_info.get('process/eventsPerSecond')
+  info['minutes'] = tracker_info.get('process/numberOfSeconds') / 60
 
   return render_template('tracker/index.html', info=info)
 
