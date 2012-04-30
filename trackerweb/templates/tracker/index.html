@@ -6,6 +6,9 @@
 tracker runtime: {{ info.uptime }}, version: {{ info.version }} <br/>
 hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '{{ info.gps_hardware }}'
 
+<table>
+<tr>
+<td>
 <h3>past {{ info.minutes }} minutes activity</h3>
 <div id="activity_plot"></div>
 <table>
@@ -14,6 +17,28 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 </tr>
 <tr>
 <td>average events per second:</td><td>{{info.eventspersecond}}</td>
+</tr>
+</table>
+
+<h3>last recorded waveform</h3>
+
+<table>
+<tr>
+<th>time-plot</th>
+<th>xy-plot</th>
+</tr>
+<tr>
+<td><div id="waveform_plot"></div></td>
+<td><div id="xy_plot"/></td>
+</tr>
+</table>
+<div id="waveform_time"></div>
+</td>
+<td valign="top">
+<h3>amplitude/phase last hour</h3>
+<div id="amplitude_phase_plot"></div>
+direction of incoming signals
+</td>
 </tr>
 </table>
 
@@ -103,22 +128,8 @@ axisGroup.
 });
 </script>
 
-<h3>last recorded waveform</h3>
-
-<table>
-<tr>
-<th>time-plot</th>
-<th>xy-plot</th>
-</tr>
-<tr>
-<td><div id="waveform_plot"></div></td>
-<td><div id="xy_plot"/></td>
-</tr>
-</table>
-<div id="waveform_time"></div>
-
 <script type="text/javascript">
-$.getJSON($SCRIPT_ROOT + '/backend/tracker/raw/-1', function(data) {
+$.getJSON($SCRIPT_ROOT + '/backend/data/raw/long/-1', function(data) {
 var eventInfo = data[0];
 var samplePeriod = eventInfo[6];
 var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
@@ -227,6 +238,66 @@ xyAxisGroup.
   style("stroke", "black");
 
 xyAxisGroup.
+  append("svg:line").
+  attr("x1", x(0)).
+  attr("y1", y(1)).
+  attr("x2", x(0)).
+  attr("y2", y(-1)).
+  style("stroke", "black");
+
+});
+</script>
+
+<script type="text/javascript">
+$('#amplitude_phase_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+$.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function(result) {
+
+var data = new Array();
+
+$.each(result, function(index, event) {
+  var maxAmplitude = event[7];
+  var maxPhase = event[8];
+  var value = new Object();
+  value.x = maxAmplitude * Math.cos(maxPhase);
+  value.y = maxAmplitude * Math.sin(maxPhase);
+  data.push(value);
+});
+
+var width = 300;
+var height = 300;
+
+var x = d3.scale.linear().domain([-1, 1]).range([0, width-1]);
+var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
+
+$('#amplitude_phase_plot').empty();
+
+var polarPlot = d3.select("#amplitude_phase_plot").
+  append("svg:svg").
+  attr("width", width).
+  attr("height", height);
+
+var dataGroup = polarPlot.append("svg:g");
+  dataGroup.selectAll("path.dot").
+  data(data).
+  enter().
+  append("svn:path").
+  attr("class", "dot").
+  attr("stroke", "none").
+  attr("fill", "green").
+  attr("transform", function(d) { return "translate(" + x(d.x) + ", " + y(d.y) + ")"; }).
+  attr("d", d3.svg.symbol().type("cross").size(15));
+
+var axisGroup = polarPlot.append("svg:g");
+
+axisGroup.
+  append("svg:line").
+  attr("x1", x(-1)).
+  attr("y1", y(0)).
+  attr("x2", x(1)).
+  attr("y2", y(0)).
+  style("stroke", "black");
+
+axisGroup.
   append("svg:line").
   attr("x1", x(0)).
   attr("y1", y(1)).
