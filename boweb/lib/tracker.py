@@ -8,7 +8,7 @@ from flask import current_app
 class Connection(object):
   def __init__(self, command, socket_file = '/tmp/.blitzortung-tracker'):
     cache = current_app.config['cache']
-    cache_item = 'trackerweb_ipc_%s' % command
+    cache_item = 'boweb_ipc_%s' % command
 
     self.json_object = cache.get(cache_item)
 

@@ -1,14 +1,19 @@
 import logging
 
+import lib
+import backend
+
 from flask import Flask, render_template
+
+all = ['lib', 'backend']
 
 logger = logging.getLogger('app')
 
 app = Flask(__name__)
 
-from trackerweb.views.tracker import tracker
-from trackerweb.views.data import data
-from trackerweb.backend.backend import backend
+from boweb.views.tracker import tracker
+from boweb.views.data import data
+from boweb.backend.backend import backend
 
 app.register_blueprint(tracker)
 app.register_blueprint(data)

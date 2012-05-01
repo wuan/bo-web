@@ -4,7 +4,7 @@ activate_this = 'bo-web/bin/activate_this.py'
 execfile(activate_this, dict(__file__ = activate_this))
 
 from werkzeug.contrib.cache import MemcachedCache
-from trackerweb import app
+from boweb import app
 
 app.config['cache'] = MemcachedCache(['127.0.0.1:11211'])
 

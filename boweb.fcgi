@@ -15,7 +15,7 @@ root_logger.addHandler(file_handler)
 
 from werkzeug.contrib.cache import MemcachedCache
 from flup.server.fcgi import WSGIServer
-from trackerweb import app
+from boweb import app
 
 app.config['cache'] = MemcachedCache(['127.0.0.1:11211'])
 

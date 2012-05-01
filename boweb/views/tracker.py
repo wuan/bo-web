@@ -8,8 +8,7 @@ import pytz
 
 from flask import Response, Blueprint, render_template, abort, current_app
 
-import trackerweb.lib.cache
-import trackerweb.lib.tracker
+import boweb
 
 tracker = Blueprint('tracker', __name__, url_prefix='/tracker')
 
@@ -17,7 +16,7 @@ tracker = Blueprint('tracker', __name__, url_prefix='/tracker')
 def index():
   info = {}
 
-  tracker_info = trackerweb.lib.tracker.Info()
+  tracker_info = boweb.lib.tracker.Info()
 
   info['uptime'] = tracker_info.get('process/uptime')
   info['numberofevents'] = tracker_info.get('process/numberOfEvents')

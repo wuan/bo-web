@@ -8,14 +8,13 @@ import subprocess
 
 from flask import Response, Blueprint, render_template, abort, current_app, jsonify
 
-import trackerweb.lib.cache
-import trackerweb.lib.tracker
+import boweb
 
 backend = Blueprint('backend', __name__, url_prefix='/backend')
 
 @backend.route('/tracker/activity')
 def get_tracker_activity():
-    connection = trackerweb.lib.tracker.Connection('getActivity')
+    connection = boweb.lib.tracker.Connection('getActivity')
     return json.dumps(connection.get('activity'))
 
 @backend.route('/data/raw/<start>')

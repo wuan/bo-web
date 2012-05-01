@@ -13,7 +13,7 @@ data = Blueprint('data', __name__, url_prefix='/data')
 
 def get_raw_files():
   cache = current_app.config['cache']
-  cache_item = 'trackerweb_raw_files'
+  cache_item = 'boweb_raw_files'
 
   raw_files = cache.get(cache_item)
 
