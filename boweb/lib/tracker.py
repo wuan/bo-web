@@ -23,6 +23,20 @@ class Connection(object):
       except socket.error:
 	pass
 
+  def is_empty(self):
+    return self.json_object is None
+
+  def has_element(self, path):
+    json_object = self.json_object
+
+    if json_object is not None:
+      for component in path.split('/'):
+        if json_object.has_key(component):
+	  json_object = json_object[component]
+	else:
+	  return False
+    return True
+
   def get(self, path):
     json_object = self.json_object
 
