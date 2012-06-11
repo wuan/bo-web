@@ -46,26 +46,38 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 
 <script type="text/javascript">
 setInterval("incrementUptime()", 1000);
+
+function parseIntFromTimeComponent(timeString) {
+  if (timeString.length > 1 && timeString[0] == '0') {
+    timeString = timeString.substr(1)
+  }
+  return parseInt(timeString);
+}
+
+function formatTimeComponent(time) {
+ return '' + (time < 10 ? '0' : '') + time
+}
+
 function incrementUptime() {
   var currentUptime = $('#tracker_uptime').text();
   var components = currentUptime.split(':');
-  var seconds = parseInt(components[2]);
-  var minutes = parseInt(components[1]);
-  var hours = parseInt(components[0]);
+  var seconds = parseIntFromTimeComponent(components[2]);
+  var minutes = parseIntFromTimeComponent(components[1]);
+  var hours = parseIntFromTimeComponent(components[0]);
 
   seconds++;
 
-  if (seconds > 60) {
+  if (seconds > 59) {
     seconds = 0;
     minutes++;
   }
 
-  if (minutes > 60) {
+  if (minutes > 59) {
     minutes = 0;
     hours++;
   }
 
-  $('#tracker_uptime').text('' + (hours < 10 ? '0' : '' ) + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '' ) + seconds);
+  $('#tracker_uptime').text(formatTimeComponent(hours) + ':' + formatTimeComponent(minutes) + ':' + formatTimeComponent(seconds));
 }
 
 function updateActivityPlot() {
