@@ -8,12 +8,8 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 
 <table>
 <tr>
-<td colspan="2">
-<h3>past {{ info.minutes }} minutes activity</h3>
-</td>
-<td>
-<h3>x/y of signal maxima last hour</h3>
-</td>
+<th colspan="2"> past {{ info.minutes }} minutes activity:</th>
+<th>x/y of signal maxima</th>
 </tr>
 <tr>
 <td colspan="2">
@@ -30,9 +26,7 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 <td><div id="amplitude_phase_plot"></div></td>
 </tr>
 <tr>
-<td>
-<h3>last recorded waveform</h3>
-</td>
+<th>last recorded waveform:</td>
 </tr>
 <tr>
 <th>time-plot</th>
