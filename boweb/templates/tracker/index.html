@@ -3,12 +3,12 @@
 {% include 'includes/base.html' %}
   <h1>Tracker status</h1>
 
-tracker runtime: <span id="tracker_uptime">{{ info.uptime }}</span>, version: {{ info.version }} <br/>
-hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '{{ info.gps_hardware }}'
+tracker runtime: <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
+hardware: firmware <span id="pcb_firmware"></span>, baudrate <span id="pcb_baudrate"></span>, gps type '<span id="gps_hardware"></span>'
 
 <table>
 <tr>
-<th colspan="2"> past <span id="activity_range">{{ info.minutes }}</span> minutes activity:</th>
+<th colspan="2"> past <span id="activity_range"></span> minutes activity:</th>
 <th>amplitude/direction of signal maxima</th>
 </tr>
 <tr>
@@ -16,10 +16,10 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 <div id="activity_plot"></div>
 <table>
 <tr>
-<td align="right"># of events:</td><td>{{info.numberofevents}}</td>
+<td align="right"># of events:</td><td><span id="activity_numberofevents"></span></td>
 </tr>
 <tr>
-<td>average events per second:</td><td>{{info.eventspersecond}}</td>
+<td>average events per second:</td><td><span id="activity_eventspersecond"></id></td>
 </tr>
 </table>
 </td>
@@ -45,40 +45,20 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 </table>
 
 <script type="text/javascript">
-setInterval("incrementUptime()", 1000);
 
-function parseIntFromTimeComponent(timeString) {
-  if (timeString.length > 1 && timeString[0] == '0') {
-    timeString = timeString.substr(1)
-  }
-  return parseInt(timeString);
+function updateTrackerInfo() {
+  $.getJSON($SCRIPT_ROOT + '/backend/tracker/info', function(data) {
+      $('#tracker_uptime').text(data['process']['uptime']);
+      $('#tracker_version').html(data['software']['version']);
+      $('#pcb_firmware').text(data['hardware']['firmware']);
+      $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
+      $('#gps_hardware').text(data['hardware']['gps']['type']);
+      $('#activity_numberofevents').text(data['process']['numberOfEvents']);
+      $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
+      });
 }
-
-function formatTimeComponent(time) {
- return '' + (time < 10 ? '0' : '') + time
-}
-
-function incrementUptime() {
-  var currentUptime = $('#tracker_uptime').text();
-  var components = currentUptime.split(':');
-  var seconds = parseIntFromTimeComponent(components[2]);
-  var minutes = parseIntFromTimeComponent(components[1]);
-  var hours = parseIntFromTimeComponent(components[0]);
-
-  seconds++;
-
-  if (seconds > 59) {
-    seconds = 0;
-    minutes++;
-  }
-
-  if (minutes > 59) {
-    minutes = 0;
-    hours++;
-  }
-
-  $('#tracker_uptime').text(formatTimeComponent(hours) + ':' + formatTimeComponent(minutes) + ':' + formatTimeComponent(seconds));
-}
+updateTrackerInfo();
+setInterval("updateTrackerInfo()", 10000);
 
 function updateActivityPlot() {
   $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function(data) {

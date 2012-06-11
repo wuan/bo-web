@@ -12,10 +12,15 @@ import boweb
 
 backend = Blueprint('backend', __name__, url_prefix='/backend')
 
+@backend.route('/tracker/info')
+def get_tracker_status():
+    connection = boweb.lib.tracker.Connection('getInfo')
+    return json.dumps(connection.get_result())
+
 @backend.route('/tracker/activity')
 def get_tracker_activity():
     connection = boweb.lib.tracker.Connection('getActivity')
-    return json.dumps(connection.get('activity'))
+    return json.dumps(connection.get_result('activity'))
 
 @backend.route('/data/raw/<start>')
 @backend.route('/data/raw/<start>/<length>')
