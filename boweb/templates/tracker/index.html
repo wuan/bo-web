@@ -36,15 +36,13 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 <tr>
 <td><div id="waveform_plot"></div></td>
 <td><div id="xy_plot"/></td>
-<td><div id="waveform_plot_normalized"></div></td>
+<td><div id="normalized_waveform_plot"></div></td>
 </tr>
 <tr>
-<td colspan="3">
-<div id="waveform_time"></div>
-</td>
+<td colspan="2"><div id="waveform_time"></div></td>
+<td><div id="normalized_waveform_info"></div></td>
 </tr>
 </table>
-
 
 <script type="text/javascript">
 $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function(data) {
@@ -63,15 +61,6 @@ var barDemo = d3.select("#activity_plot").
   append("svg:svg").
   attr("width", totalWidth).
   attr("height", totalHeight);
-
-/*barDemo.
-  append("svg:rect").
-  attr("x", 0).
-  attr("y", 0).
-  attr("height", totalHeight).
-  attr("width", totalWidth).
-  attr("stroke", "green").
-  attr("fill", "#aaaaaa");*/
 
 var dataGroup = barDemo.append("svg:g").
   attr("transform", "translate("+padding+",0)");
@@ -252,6 +241,81 @@ xyAxisGroup.
 </script>
 
 <script type="text/javascript">
+$.getJSON($SCRIPT_ROOT + '/backend/data/raw/normalized/-1', function(data) {
+var eventInfo = data[0];
+var samplePeriod = eventInfo[6];
+var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
+var maxPhase = eventInfo[8];
+var maxIndex = eventInfo[9];
+var data = eventInfo[10];
+
+var ndata = data[0];
+var angle = data[1];
+var residuum = data[2];
+
+var totalWidth = 400;
+var totalHeight = 200;
+var padding = 6;
+var width = totalWidth - padding;
+var height = totalHeight;
+
+var x = d3.scale.linear().domain([0, ndata.length * samplePeriod]).range([0, width-1]);
+var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
+
+$('#normalized_waveform_info').text('rot angle ' + (angle / Math.PI * 180).toFixed(1) + '°, perp. residuum ' + residuum.toFixed(2));
+
+var waveformPlot = d3.select("#normalized_waveform_plot").
+  append("svg:svg").
+  attr("width", totalWidth).
+  attr("height", totalHeight);
+
+var dataGroup = waveformPlot.append("svg:g").
+  attr("transform", "translate("+padding+",0)");
+
+var timeLine = d3.svg.line().
+    x(function(d, i) { return x(samplePeriod * i); }).
+    y(function(d, i) { return y(d); }).
+    interpolate("linear");
+
+  dataGroup.append("svg:path").
+    attr("d", timeLine(ndata)).
+    style("stroke", "blue").
+    style("fill", "none");
+
+var timeAxisGroup = waveformPlot.append("svg:g").
+  attr("transform", "translate("+padding+",0)");
+
+timeAxisGroup.selectAll(".yTicks").
+  data(d3.range(-1, 2)).
+  enter().
+  append("svg:line").
+  attr("x1", -5).
+  attr("y1", function(d) {return y(d);}).
+  attr("x2", x(0)).
+  attr("y2", function(d) {return y(d);}).
+  style("stroke", "black").
+  attr("class", "ytics");
+
+timeAxisGroup.
+  append("svg:line").
+  attr("x1", x(0)).
+  attr("y1", height - y(0)).
+  attr("x2", x(ndata.length * samplePeriod)).
+  attr("y2", height - y(0)).
+  style("stroke", "black");
+
+timeAxisGroup.
+  append("svg:line").
+  attr("x1", x(0)).
+  attr("y1", y(1)).
+  attr("x2", x(0)).
+  attr("y2", y(-1)).
+  style("stroke", "black");
+
+});
+</script>
+
+<script type="text/javascript">
 $('#amplitude_phase_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
 $.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function(result) {
 
@@ -311,73 +375,3 @@ axisGroup.
 });
 </script>
 
-<script type="text/javascript">
-$.getJSON($SCRIPT_ROOT + '/backend/data/raw/normalized/-1', function(data) {
-var eventInfo = data[0];
-var samplePeriod = eventInfo[6];
-var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
-var maxPhase = eventInfo[8];
-var maxIndex = eventInfo[9];
-var data = eventInfo[10];
-
-var ndata = data[0];
-
-var totalWidth = 400;
-var totalHeight = 200;
-var padding = 6;
-var width = totalWidth - padding;
-var height = totalHeight;
-
-var x = d3.scale.linear().domain([0, ndata.length * samplePeriod]).range([0, width-1]);
-var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
-
-var waveformPlot = d3.select("#waveform_plot_normalized").
-  append("svg:svg").
-  attr("width", totalWidth).
-  attr("height", totalHeight);
-
-var dataGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
-
-var timeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(d); }).
-    interpolate("linear");
-
-  dataGroup.append("svg:path").
-    attr("d", timeLine(ndata)).
-    style("stroke", "blue").
-    style("fill", "none");
-
-var timeAxisGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
-
-timeAxisGroup.selectAll(".yTicks").
-  data(d3.range(-1, 2)).
-  enter().
-  append("svg:line").
-  attr("x1", -5).
-  attr("y1", function(d) {return y(d);}).
-  attr("x2", x(0)).
-  attr("y2", function(d) {return y(d);}).
-  style("stroke", "black").
-  attr("class", "ytics");
-
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", height - y(0)).
-  attr("x2", x(ndata.length * samplePeriod)).
-  attr("y2", height - y(0)).
-  style("stroke", "black");
-
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", y(1)).
-  attr("x2", x(0)).
-  attr("y2", y(-1)).
-  style("stroke", "black");
-
-});
-</script>
