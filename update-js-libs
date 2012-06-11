@@ -1,7 +1,14 @@
 #!/bin/bash
 
-TARGETDIR=trackerweb/static/jslib
+TARGETDIR=boweb/static/jslib
 
 wget http://code.jquery.com/jquery.min.js -O $TARGETDIR/jquery.js
 wget http://mbostock.github.com/d3/d3.v2.min.js  -O $TARGETDIR/d3.js
 
+SLICKGRID_ARCHIVE=$(mktemp --suffix=_slickgrid.tar.gz)
+wget https://github.com/mleibman/SlickGrid/tarball/2.0.1 -O $SLICKGRID_ARCHIVE
+tar xvzf $SLICKGRID_ARCHIVE --strip-components 1 --no-anchored -C $TARGETDIR slick.core.js
+rm -rf $SLICKGRID_ARCHIVE
+
+JQUERY_UI_ARCHIVE=$(mktemp --suffix=_jquery_ui.zip)
+wget http://jqueryui.com/download/jquery-ui-1.8.20.custom.zip -O $JQUERY_UI_ARCHIVE

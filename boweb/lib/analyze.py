@@ -7,7 +7,7 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
-json_data = subprocess.Popen(['bo-data', '-i', 'AndreasW_20120528.bor', '-l', '-j', '--start=-1'], stdout=subprocess.PIPE).communicate()[0]
+json_data = subprocess.Popen(['bo-data', '-i', '/var/cache/blitzortung/raw/AndreasW_20120607.bor', '-l', '-j', '--start=-1'], stdout=subprocess.PIPE).communicate()[0]
 data = json.loads(json_data)
 dt = data[0][6]/1e6 # time in ms
 data_array = data[0][10]

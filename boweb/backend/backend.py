@@ -34,10 +34,10 @@ def get_data_raw_time(start, end=""):
     now = datetime.datetime.utcnow()
     date = now.date()
     if starttime < 0:
-        starttime = now + datetime.timedelta(minutes=starttime)
-        if now.date() != starttime.date():
-	    starttime = datetime.timedelta(minutes=0)
-	start = starttime.strftime("%H%M%S")
+        starttimestamp = now + datetime.timedelta(minutes=starttime)
+        if now.date() != starttimestamp.date():
+	    starttimestamp = datetime.datetime.combine(now.date(), datetime.time(0,0,0))
+	start = starttimestamp.strftime("%H%M%S")
     data_file = get_raw_files().get(date)
 
     cache = current_app.config['cache']
@@ -60,6 +60,16 @@ def get_data_raw_long(start, length="-1"):
     data_file = get_raw_files().get(date)
 
     data = subprocess.Popen(['bo-data', '-i', data_file, '--start', start, '--number', length, '--long-data', '--json'], stdout=subprocess.PIPE)
+    (output, _) = data.communicate()
+    return output
+
+@backend.route('/data/raw/normalized/<start>')
+@backend.route('/data/raw/normalized/<start>/<length>')
+def get_data_raw_normalized(start, length="-1"):
+    date = datetime.datetime.utcnow().date()
+    data_file = get_raw_files().get(date)
+
+    data = subprocess.Popen(['bo-data', '-i', data_file, '--start', start, '--number', length, '--long-data', '--normalize', '--json'], stdout=subprocess.PIPE)
     (output, _) = data.communicate()
     return output
 
