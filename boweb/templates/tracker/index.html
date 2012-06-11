@@ -8,7 +8,7 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 
 <table>
 <tr>
-<th colspan="2"> past {{ info.minutes }} minutes activity:</th>
+<th colspan="2"> past <span id="activity_range">{{ info.minutes }}</span> minutes activity:</th>
 <th>x/y of signal maxima</th>
 </tr>
 <tr>
@@ -92,6 +92,8 @@ function updateActivityPlot() {
 
   var x = d3.scale.linear().domain([0, data.length]).range([0, width-1]);
   var y = d3.scale.linear().domain([0, d3.max(data)]).range([height-1, 0]);
+
+  $('#activity_range').text('' + data.length)
 
   $('#activity_plot').empty();
   var barDemo = d3.select("#activity_plot").
@@ -257,7 +259,7 @@ var xyLine = d3.svg.line().
 
   xyDataGroup.append("svg:path").
     attr("d", xyLine(xdata)).
-    style("stroke", "green").
+    style("stroke", "blue").
     style("fill", "none");
 
 var xyAxisGroup = xyPlot.append("svg:g");
