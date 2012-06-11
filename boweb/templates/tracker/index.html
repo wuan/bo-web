@@ -362,8 +362,10 @@ setInterval("updateCurrentWaveform()", 2000);
 </script>
 
 <script type="text/javascript">
+
+$('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+
 function updateAmplitudeDirectionPlot() {
-  $('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
   $.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function(result) {
 
   var data = new Array();
