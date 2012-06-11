@@ -18,7 +18,7 @@ class Connection(object):
 	s.connect("/tmp/.blitzortung-tracker")
 	s.send(json.dumps({'cmd':command}))
 	self.json_object = json.loads(s.recv(10240))
-        cache.set(cache_item, self.json_object, timeout=60)
+        cache.set(cache_item, self.json_object, timeout=10)
 	s.close()
       except socket.error:
 	pass

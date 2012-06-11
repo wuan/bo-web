@@ -3,7 +3,7 @@
 {% include 'includes/base.html' %}
   <h1>Tracker status</h1>
 
-tracker runtime: {{ info.uptime }}, version: {{ info.version }} <br/>
+tracker runtime: <span id="tracker_uptime">{{ info.uptime }}</span>, version: {{ info.version }} <br/>
 hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '{{ info.gps_hardware }}'
 
 <table>
@@ -45,6 +45,29 @@ hardware: firmware {{ info.firmware }}, baudrate {{ info.baudrate }}, gps type '
 </table>
 
 <script type="text/javascript">
+setInterval("incrementUptime()", 1000);
+function incrementUptime() {
+  var currentUptime = $('#tracker_uptime').text();
+  var components = currentUptime.split(':');
+  var seconds = parseInt(components[2]);
+  var minutes = parseInt(components[1]);
+  var hours = parseInt(components[0]);
+
+  seconds++;
+
+  if (seconds > 60) {
+    seconds = 0;
+    minutes++;
+  }
+
+  if (minutes > 60) {
+    minutes = 0;
+    hours++;
+  }
+
+  $('#tracker_uptime').text('' + (hours < 10 ? '0' : '' ) + hours + ':' + (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '' ) + seconds);
+}
+
 function updateActivityPlot() {
   $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function(data) {
 
