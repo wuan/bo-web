@@ -1,10 +1,13 @@
 <!doctype html>
-<title>Tracker status</title>
+<title>Tracker Status</title>
 {% include 'includes/base.html' %}
-  <h1>Tracker status</h1>
+  <h1>Tracker Status</h1>
 
-tracker runtime: <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
-hardware: firmware <span id="pcb_firmware"></span>, baudrate <span id="pcb_baudrate"></span>, gps type '<span id="gps_hardware"></span>'
+<strong>software:</strong> uptime <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
+<strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span id="pcb_baudrate"></span>, timer ticks per second <span id="pcb_timer"></span><br/>
+<strong>gps:</strong> position <span id="gps_position"></span>, status <span id="gps_status"></span>, <span id="gps_satelliteCount"></span> satellites in view, type '<span id="gps_hardwareType"></span>', baudrate <span id="gps_baudRate"></span><br/>
+
+<p/>
 
 <table>
 <tr>
@@ -52,7 +55,12 @@ function updateTrackerInfo() {
       $('#tracker_version').html(data['software']['version']);
       $('#pcb_firmware').text(data['hardware']['firmware']);
       $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
-      $('#gps_hardware').text(data['hardware']['gps']['type']);
+      $('#pcb_timer').text(data['hardware']['gps']['ticksPerSecond']);
+      $('#gps_position').text('(' + data['hardware']['gps']['longitude'].toFixed(4) + ", " + data['hardware']['gps']['latitude'].toFixed(4) + ', ' + data['hardware']['gps']['altitude'].toFixed(0) + ')');
+      $('#gps_status').text(data['hardware']['gps']['status']);
+      $('#gps_satelliteCount').text(data['hardware']['gps']['satelliteCount']);
+      $('#gps_hardwareType').text(data['hardware']['gps']['type']);
+      $('#gps_baudRate').text(data['hardware']['gps']['baudRate']);
       $('#activity_numberofevents').text(data['process']['numberOfEvents']);
       $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
       });
