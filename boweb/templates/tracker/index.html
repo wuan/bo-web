@@ -34,16 +34,16 @@
 <tr>
 <th>time-plot</th>
 <th>xy-plot</th>
-<th>normalized time-plot</th>
+<th>frequency distribution</th>
 </tr>
 <tr>
 <td><div id="waveform_plot"></div></td>
 <td><div id="xy_plot"/></td>
-<td><div id="normalized_waveform_plot"></div></td>
+<td><div id="spectrum_plot"></div></td>
 </tr>
 <tr>
-<td colspan="2"><div id="waveform_time"></div></td>
-<td><div id="normalized_waveform_info"></div></td>
+<td colspan="2"><div id="waveform_info"></div></td>
+<td><div id="spectrum_info"></div></td>
 </tr>
 </table>
 
@@ -154,11 +154,11 @@ $.getJSON($SCRIPT_ROOT + '/backend/data/raw/long/-1', function(data) {
 var eventInfo = data[0];
 var samplePeriod = eventInfo[6];
 var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
-var maxPhase = eventInfo[8];
+var phase = eventInfo[8];
 var maxIndex = eventInfo[9];
 var data = eventInfo[10];
 
-$('#waveform_time').text(eventInfo[0] + '.' + eventInfo[1] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod/1000).toFixed(2) + ' us (' + maxIndex + ')');
+$('#waveform_info').text(eventInfo[0] + '.' + eventInfo[1] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod/1000).toFixed(2) + ' us (' + maxIndex + '), ' + (phase / Math.PI * 180).toFixed(1) + '°');
 
 var xdata = data[0];
 var ydata = data[1];
@@ -186,6 +186,13 @@ var timeLine = d3.svg.line().
     y(function(d, i) { return y(d); }).
     interpolate("linear");
 
+var cos_phase = Math.cos(-phase)
+var sin_phase = Math.sin(-phase)
+var normalizedTimeLine = d3.svg.line().
+    x(function(d, i) { return x(samplePeriod * i); }).
+    y(function(d, i) { return y(xdata[i] * cos_phase - ydata[i] * sin_phase); }).
+    interpolate("linear");
+
   dataGroup.append("svg:path").
     attr("d", timeLine(xdata)).
     style("stroke", "green").
@@ -194,6 +201,11 @@ var timeLine = d3.svg.line().
   dataGroup.append("svg:path").
     attr("d", timeLine(ydata)).
     style("stroke", "red").
+    style("fill", "none");
+
+  dataGroup.append("svg:path").
+    attr("d", normalizedTimeLine(xdata)).
+    style("stroke", "blue").
     style("fill", "none");
 
 var timeAxisGroup = waveformPlot.append("svg:g").
@@ -238,6 +250,15 @@ var xyPlot = d3.select("#xy_plot").
   attr("width", width).
   attr("height", height);
 
+var xyPhaseGroup = xyPlot.append("svg:g");
+  xyPhaseGroup.append("svg:line").
+    attr("x1", x(cos_phase)).
+    attr("y1", y(-sin_phase)).
+    attr("x2", x(-cos_phase)).
+    attr("y2", y(sin_phase)).
+    style("stroke", "gray").
+    style("fill", "none");
+
 var xyDataGroup = xyPlot.append("svg:g");
 
 var xyLine = d3.svg.line().
@@ -250,6 +271,7 @@ var xyLine = d3.svg.line().
     style("stroke", "blue").
     style("fill", "none");
 
+
 var xyAxisGroup = xyPlot.append("svg:g");
 
 xyAxisGroup.
@@ -261,80 +283,6 @@ xyAxisGroup.
   style("stroke", "black");
 
 xyAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", y(1)).
-  attr("x2", x(0)).
-  attr("y2", y(-1)).
-  style("stroke", "black");
-
-});
-
-$.getJSON($SCRIPT_ROOT + '/backend/data/raw/normalized/-1', function(data) {
-var eventInfo = data[0];
-var samplePeriod = eventInfo[6];
-var maxAmplitude = eventInfo[7] / Math.sqrt(2) * 100
-var maxPhase = eventInfo[8];
-var maxIndex = eventInfo[9];
-var data = eventInfo[10];
-
-var ndata = data[0];
-var angle = data[1];
-var residuum = data[2];
-
-var totalWidth = 400;
-var totalHeight = 200;
-var padding = 6;
-var width = totalWidth - padding;
-var height = totalHeight;
-
-var x = d3.scale.linear().domain([0, ndata.length * samplePeriod]).range([0, width-1]);
-var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
-
-$('#normalized_waveform_info').text('rot angle ' + (angle / Math.PI * 180).toFixed(1) + '°, perp. residuum ' + residuum.toFixed(2));
-
-$("#normalized_waveform_plot").empty();
-var waveformPlot = d3.select("#normalized_waveform_plot").
-  append("svg:svg").
-  attr("width", totalWidth).
-  attr("height", totalHeight);
-
-var dataGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
-
-var timeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(d); }).
-    interpolate("linear");
-
-  dataGroup.append("svg:path").
-    attr("d", timeLine(ndata)).
-    style("stroke", "blue").
-    style("fill", "none");
-
-var timeAxisGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
-
-timeAxisGroup.selectAll(".yTicks").
-  data(d3.range(-1, 2)).
-  enter().
-  append("svg:line").
-  attr("x1", -5).
-  attr("y1", function(d) {return y(d);}).
-  attr("x2", x(0)).
-  attr("y2", function(d) {return y(d);}).
-  style("stroke", "black").
-  attr("class", "ytics");
-
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", height - y(0)).
-  attr("x2", x(ndata.length * samplePeriod)).
-  attr("y2", height - y(0)).
-  style("stroke", "black");
-
-timeAxisGroup.
   append("svg:line").
   attr("x1", x(0)).
   attr("y1", y(1)).
@@ -360,10 +308,10 @@ function updateAmplitudeDirectionPlot() {
 
   $.each(result, function(index, event) {
     var maxAmplitude = event[7];
-    var maxPhase = event[8];
+    var phase = event[8];
     var value = new Object();
-    value.x = maxAmplitude * Math.cos(maxPhase);
-    value.y = maxAmplitude * Math.sin(maxPhase);
+    value.x = maxAmplitude * Math.cos(phase);
+    value.y = maxAmplitude * Math.sin(phase);
     data.push(value);
   });
 
