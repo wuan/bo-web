@@ -12,3 +12,7 @@ install software
 install local copy of JavaScript libraries
 
 > ./update-js-libs 
+
+to start the server for development/test you can now just enter
+
+> ./runserver.py
