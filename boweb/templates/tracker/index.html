@@ -257,6 +257,7 @@ var xyPhaseGroup = xyPlot.append("svg:g");
     attr("x2", x(-cos_phase)).
     attr("y2", y(sin_phase)).
     style("stroke", "gray").
+    style("stroke-dasharray", "5 5").
     style("fill", "none");
 
 var xyDataGroup = xyPlot.append("svg:g");
