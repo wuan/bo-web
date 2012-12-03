@@ -4,6 +4,7 @@ TARGETDIR=boweb/static/jslib
 
 wget http://code.jquery.com/jquery.min.js -O $TARGETDIR/jquery.js
 wget http://mbostock.github.com/d3/d3.v2.min.js  -O $TARGETDIR/d3.js
+wget https://raw.github.com/corbanbrook/dsp.js/master/dsp.js -O $TARGETDIR/dsp.js
 
 SLICKGRID_ARCHIVE=$(mktemp --suffix=_slickgrid.tar.gz)
 wget https://github.com/mleibman/SlickGrid/tarball/2.0.1 -O $SLICKGRID_ARCHIVE
