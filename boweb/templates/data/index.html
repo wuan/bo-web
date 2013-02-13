@@ -1,76 +1,85 @@
 <!doctype html>
-<title>Hello from Flask</title>
+<title>Blitzortung Data</title>
 {% include 'includes/base.html' %}
-  <h1>Data Overview</h1>
+<h1>Data Overview</h1>
 
 <script type="text/javascript">
-  $(document).ready(
-      function() {
-        $.getJSON($SCRIPT_ROOT + '/data/_get_date', {},
-	  function(data) {
-	    var items = new Array();
-	    $.each(data.result, function(index, date) {
-	      items.push(new Option(date, date, index==0, index==0));
-	      });
-	    $('#result').html(items);
-	    $('#result').change();
-	    });
-	return true;
-      });
+    $(document).ready(
+            function () {
+                $.getJSON($SCRIPT_ROOT + '/data/_get_date', {},
+                        function (data) {
+                            var items;
+                            items = [];
+                            $.each(data.result, function (index, date) {
+                                items.push(new Option(date, date, index == 0, index == 0));
+                            });
+                            $('#result').html(items);
+                            $('#result').change();
+                        });
+                return true;
+            });
 </script>
 
 <script type="text/javascript">
-function onDateChange() {
-  var date = $('#result option:selected').val()
+    function onDateChange() {
+        var date = $('#result option:selected').val()
 
-  $('#total').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
-  $('#avg_amp').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
-  $('#histogram').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
-  $.getJSON($SCRIPT_ROOT + '/data/_get_date/' + date,
-      function(data) {
-        $('#total').text(data.total);
-        $('#avg_amp').text(data.avg_amp);
-	});
+        $('#total').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+        $('#avg_amp').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+        $('#histogram').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+        $.getJSON($SCRIPT_ROOT + '/data/_get_date/' + date,
+                function (data) {
+                    $('#total').text(data.total);
+                    $('#avg_amp').text(data.avg_amp);
+                });
 
-  $.getJSON($SCRIPT_ROOT + '/data/_get_histogram/' + date, function(data) {
+        $.getJSON($SCRIPT_ROOT + '/data/_get_histogram/' + date, function (data) {
 
-  var width = 400;
-  var barWidth = width / data.y.length;
-  var height = 200;
+            var width = 400;
+            var barWidth = width / data.y.length;
+            var height = 200;
 
-  $('#histogram').empty();
-  var barDemo = d3.select("#histogram").
-  append("svg:svg").
-  attr("width", width).
-  attr("height", height);
+            $('#histogram').empty();
+            var barDemo = d3.select("#histogram").
+                    append("svg:svg").
+                    attr("width", width).
+                    attr("height", height);
 
-var x = d3.scale.linear().domain([0, data.x.length]).range([0, width]);
-var y = d3.scale.linear().domain([0, d3.max(data.y)]).range([0, height]);
+            var x = d3.scale.linear().domain([0, data.x.length]).range([0, width]);
+            var y = d3.scale.linear().domain([0, d3.max(data.y)]).range([0, height]);
 
-barDemo.selectAll("rect").
-  data(data.y).
-  enter().
-  append("svg:rect").
-  attr("x", function(datum, index) { return x(index); }).
-  attr("y", function(datum, index) { return height - y(datum); }).
-  attr("height", function(datum, index) { return y(datum); }).
-  attr("width", barWidth).
-  attr("fill", "#2d578b");
-});
-}
+            barDemo.selectAll("rect").
+                    data(data.y).
+                    enter().
+                    append("svg:rect").
+                    attr("x",function (datum, index) {
+                        return x(index);
+                    }).
+                    attr("y",function (datum, index) {
+                        return height - y(datum);
+                    }).
+                    attr("height",function (datum, index) {
+                        return y(datum);
+                    }).
+                    attr("width", barWidth).
+                    attr("fill", "#2d578b");
+        });
+    }
 </script>
 
 <select id="result" onChange="onDateChange()">
 </select>
 
 <table>
-<tr>
-<th># of events</th><th>average amplitude</th>
-</tr>
-<tr>
-<td id="total">asdf</td><td id="avg_amp">asd</td>
-</tr>
+    <tr>
+        <th># of events</th>
+        <th>average amplitude</th>
+    </tr>
+    <tr>
+        <td id="total">asdf</td>
+        <td id="avg_amp">asd</td>
+    </tr>
 </table>
 
-<div id="histogram"/>
+<div id="histogram"></div>
 

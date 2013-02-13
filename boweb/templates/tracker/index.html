@@ -1,437 +1,501 @@
 <!doctype html>
 <title>Tracker Status</title>
 {% include 'includes/base.html' %}
-  <h1>Tracker Status</h1>
+<h1>Tracker Status</h1>
 
 <strong>software:</strong> uptime <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
-<strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span id="pcb_baudrate"></span>, timer ticks per second <span id="pcb_timer"></span><br/>
-<strong>gps:</strong> position <span id="gps_position"></span>, status <span id="gps_status"></span>, <span id="gps_satelliteCount"></span> satellites in view, type '<span id="gps_hardwareType"></span>', baudrate <span id="gps_baudRate"></span><br/>
+<strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span
+        id="pcb_baudrate"></span>, timer ticks per second <span id="pcb_timer"></span><br/>
+<strong>gps:</strong> position <span id="gps_position"></span>, status <span id="gps_status"></span>, <span
+        id="gps_satelliteCount"></span> satellites in view, type '<span id="gps_hardwareType"></span>', baudrate <span
+        id="gps_baudRate"></span><br/>
 
-<p/>
+<p></p>
 
 <table>
-<tr>
-<th colspan="2"> past <span id="activity_range"></span> minutes activity:</th>
-<th>amplitude/direction of signal maxima</th>
-</tr>
-<tr>
-<td colspan="2">
-<div id="activity_plot"></div>
-<table>
-<tr>
-<td align="right"># of events:</td><td><span id="activity_numberofevents"></span></td>
-</tr>
-<tr>
-<td>average events per second:</td><td><span id="activity_eventspersecond"></id></td>
-</tr>
-</table>
-</td>
-<td><div id="amplitude_direction_plot"></div></td>
-</tr>
-<tr>
-<th>last recorded waveform:</td>
-</tr>
-<tr>
-<th>time-plot</th>
-<th>xy-plot</th>
-<th><!--frequency distribution--></th>
-</tr>
-<tr>
-<td><div id="waveform_plot"></div></td>
-<td><div id="xy_plot"/></td>
-<td><!--<div id="spectrum_plot"></div>--></td>
-</tr>
-<tr>
-<td colspan="2"><div id="waveform_info"></div></td>
-<td><div id="spectrum_info"></div></td>
-</tr>
+    <tr>
+        <th colspan="2"> past <span id="activity_range"></span> minutes activity:</th>
+        <th>amplitude/direction of signal maxima</th>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div id="activity_plot"></div>
+            <table>
+                <tr>
+                    <td align="right"># of events:</td>
+                    <td><span id="activity_numberofevents"></span></td>
+                </tr>
+                <tr>
+                    <td>average events per second:</td>
+                    <td><span id="activity_eventspersecond"></span></td>
+                </tr>
+            </table>
+        </td>
+        <td>
+            <div id="amplitude_direction_plot"></div>
+        </td>
+    </tr>
+    <tr>
+        <th>last recorded waveform:</th>
+    </tr>
+    <tr>
+        <th>time-plot</th>
+        <th>xy-plot</th>
+        <th><!--frequency distribution--></th>
+    </tr>
+    <tr>
+        <td>
+            <div id="waveform_plot"></div>
+        </td>
+        <td>
+            <div id="xy_plot"></div>
+        </td>
+        <td><!--<div id="spectrum_plot"></div>--></td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div id="waveform_info"></div>
+        </td>
+        <td>
+            <div id="spectrum_info"></div>
+        </td>
+    </tr>
 </table>
 
 <script type="text/javascript">
 
 function updateTrackerInfo() {
-  $.getJSON($SCRIPT_ROOT + '/backend/tracker/info', function(data) {
-      $('#tracker_uptime').text(data['process']['uptime']);
-      $('#tracker_version').html(data['software']['version']);
-      $('#pcb_firmware').text(data['hardware']['firmware']);
-      $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
-      $('#pcb_timer').text(data['hardware']['gps']['ticksPerSecond']);
-      $('#gps_position').text('(' + data['hardware']['gps']['longitude'].toFixed(4) + ", " + data['hardware']['gps']['latitude'].toFixed(4) + ', ' + data['hardware']['gps']['altitude'].toFixed(0) + ')');
-      $('#gps_status').text(data['hardware']['gps']['status']);
-      $('#gps_satelliteCount').text(data['hardware']['gps']['satelliteCount']);
-      $('#gps_hardwareType').text(data['hardware']['gps']['type']);
-      $('#gps_baudRate').text(data['hardware']['gps']['baudRate']);
-      $('#activity_numberofevents').text(data['process']['numberOfEvents']);
-      $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
-      });
+    $.getJSON($SCRIPT_ROOT + '/backend/tracker/info', function (data) {
+        $('#tracker_uptime').text(data['process']['uptime']);
+        $('#tracker_version').html(data['software']['version']);
+        $('#pcb_firmware').text(data['hardware']['firmware']);
+        $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
+        $('#pcb_timer').text(data['hardware']['gps']['ticksPerSecond']);
+        $('#gps_position').text('(' + data['hardware']['gps']['longitude'].toFixed(4) + ", " + data['hardware']['gps']['latitude'].toFixed(4) + ', ' + data['hardware']['gps']['altitude'].toFixed(0) + ')');
+        $('#gps_status').text(data['hardware']['gps']['status']);
+        $('#gps_satelliteCount').text(data['hardware']['gps']['satelliteCount']);
+        $('#gps_hardwareType').text(data['hardware']['gps']['type']);
+        $('#gps_baudRate').text(data['hardware']['gps']['baudRate']);
+        $('#activity_numberofevents').text(data['process']['numberOfEvents']);
+        $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
+    });
 }
 updateTrackerInfo();
 setInterval("updateTrackerInfo()", 10000);
 
 function updateActivityPlot() {
-  $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function(data) {
+    $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function (data) {
 
-  var totalWidth = 400;
-  var totalHeight = 200;
-  var padding = 6;
-  var width = totalWidth - padding;
-  var height = totalHeight;
-  var barWidth = width / data.length;
+        var totalWidth = 400;
+        var totalHeight = 200;
+        var padding = 6;
+        var width = totalWidth - padding;
+        var height = totalHeight;
+        var barWidth = width / data.length;
 
-  var x = d3.scale.linear().domain([0, data.length]).range([0, width-1]);
-  var y = d3.scale.linear().domain([0, d3.max(data)]).range([height-1, 0]);
+        var x = d3.scale.linear().domain([0, data.length]).range([0, width - 1]);
+        var y = d3.scale.linear().domain([0, d3.max(data)]).range([height - 1, 0]);
 
-  $('#activity_range').text('' + data.length)
+        $('#activity_range').text('' + data.length)
 
-  $('#activity_plot').empty();
-  var barDemo = d3.select("#activity_plot").
-    append("svg:svg").
-    attr("width", totalWidth).
-    attr("height", totalHeight);
+        $('#activity_plot').empty();
+        var barDemo = d3.select("#activity_plot").
+                append("svg:svg").
+                attr("width", totalWidth).
+                attr("height", totalHeight);
 
-  var dataGroup = barDemo.append("svg:g").
-    attr("transform", "translate("+padding+",0)");
+        var dataGroup = barDemo.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-    dataGroup.selectAll("rect").
-    data(data).
-    enter().
-    append("svg:rect").
-    attr("x", function(datum, index) { return x(index); }).
-    attr("y", function(datum, index) { return y(datum); }).
-    attr("height", function(datum, index) { return y(0) - y(datum); }).
-    attr("width", barWidth).
-    attr("fill", "#88aaee");
+        dataGroup.selectAll("rect").
+                data(data).
+                enter().
+                append("svg:rect").
+                attr("x",function (datum, index) {
+                    return x(index);
+                }).
+                attr("y",function (datum, index) {
+                    return y(datum);
+                }).
+                attr("height",function (datum, index) {
+                    return y(0) - y(datum);
+                }).
+                attr("width", barWidth).
+                attr("fill", "#88aaee");
 
-  dataGroup.selectAll("text").
-    data(data).
-    enter().
-    append("svg:text").
-    attr("x", function(datum, index) { return (x(index) + barWidth/2.0); }).
-    attr("y", function(datum) { return y(datum); }).
-    attr("dy", "1.2em").
-    attr("text-anchor", "middle").
-    text(function(datum) {if (datum == d3.max(data)) {return datum;}}).
-    style("fill", "black").
-    style("font-size", 8);
+        dataGroup.selectAll("text").
+                data(data).
+                enter().
+                append("svg:text").
+                attr("x",function (datum, index) {
+                    return (x(index) + barWidth / 2.0);
+                }).
+                attr("y",function (datum) {
+                    return y(datum);
+                }).
+                attr("dy", "1.2em").
+                attr("text-anchor", "middle").
+                text(function (datum) {
+                    if (datum == d3.max(data)) {
+                        return datum;
+                    }
+                }).
+                style("fill", "black").
+                style("font-size", 8);
 
-  var axisGroup = barDemo.append("svg:g").
-    attr("transform", "translate("+padding+",0)");
+        var axisGroup = barDemo.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-  axisGroup.selectAll(".yTicks").
-    data(d3.range(0, d3.max(data)+1)).
-    enter().
-    append("svg:line").
-    attr("x1", -5).
-    attr("y1", function(d) {return y(d);}).
-    attr("x2", 0).
-    attr("y2", function(d) {return y(d);}).
-    style("stroke", "black").
-    attr("class", "ytics");
+        axisGroup.selectAll(".yTicks").
+                data(d3.range(0, d3.max(data) + 1)).
+                enter().
+                append("svg:line").
+                attr("x1", -5).
+                attr("y1",function (d) {
+                    return y(d);
+                }).
+                attr("x2", 0).
+                attr("y2",function (d) {
+                    return y(d);
+                }).
+                style("stroke", "black").
+                attr("class", "ytics");
 
-  axisGroup.
-    append("svg:line").
-    attr("x1", x(0)).
-    attr("y1", y(0)).
-    attr("x2", x(data.length)).
-    attr("y2", y(0)).
-    style("stroke", "black");
+        axisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", y(0)).
+                attr("x2", x(data.length)).
+                attr("y2", y(0)).
+                style("stroke", "black");
 
-  axisGroup.
-    append("svg:line").
-    attr("x1", x(0)).
-    attr("y1", y(d3.max(data))).
-    attr("x2", x(0)).
-    attr("y2", y(0)).
-    style("stroke", "black");
+        axisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", y(d3.max(data))).
+                attr("x2", x(0)).
+                attr("y2", y(0)).
+                style("stroke", "black");
 
-  });
+    });
 }
 updateActivityPlot();
 setInterval("updateActivityPlot()", 60000);
 
 function updateCurrentWaveform() {
-$.getJSON($SCRIPT_ROOT + '/backend/data/raw/long/-1', function(data) {
-var eventInfo = data[0];
-var samplePeriod = eventInfo[5];
-var maxAmplitude = eventInfo[6] / Math.sqrt(2) * 100
-var phase = eventInfo[7];
-var maxIndex = eventInfo[8];
-var data = eventInfo[9];
+    $.getJSON($SCRIPT_ROOT + '/backend/data/raw/long/-1', function (data) {
+        var eventInfo = data[0];
+        var samplePeriod = eventInfo[5];
+        var maxAmplitude = eventInfo[6] / Math.sqrt(2) * 100
+        var phase = eventInfo[7];
+        var maxIndex = eventInfo[8];
+        var data = eventInfo[9];
 
-$('#waveform_info').text(eventInfo[0] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod/1000).toFixed(2) + ' us (' + maxIndex + '), ' + (phase / Math.PI * 180).toFixed(1) + '°');
+        $('#waveform_info').text(eventInfo[0] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod / 1000).toFixed(2) + ' us (' + maxIndex + '), ' + (phase / Math.PI * 180).toFixed(1) + '°');
 
-var xdata = data[0];
-var ydata = data[1];
+        var xdata = data[0];
+        var ydata = data[1];
 
-var totalWidth = 400;
-var totalHeight = 200;
-var padding = 6;
-var width = totalWidth - padding;
-var height = totalHeight;
+        var totalWidth = 400;
+        var totalHeight = 200;
+        var padding = 6;
+        var width = totalWidth - padding;
+        var height = totalHeight;
 
-var x = d3.scale.linear().domain([0, xdata.length * samplePeriod]).range([0, width-1]);
-var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
+        var x = d3.scale.linear().domain([0, xdata.length * samplePeriod]).range([0, width - 1]);
+        var y = d3.scale.linear().domain([-1, 1]).range([height - 1, 0]);
 
-$("#waveform_plot").empty();
-var waveformPlot = d3.select("#waveform_plot").
-  append("svg:svg").
-  attr("width", totalWidth).
-  attr("height", totalHeight);
+        $("#waveform_plot").empty();
+        var waveformPlot = d3.select("#waveform_plot").
+                append("svg:svg").
+                attr("width", totalWidth).
+                attr("height", totalHeight);
 
-var dataGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
+        var dataGroup = waveformPlot.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-var timeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(d); }).
-    interpolate("linear");
+        var timeLine = d3.svg.line().
+                x(function (d, i) {
+                    return x(samplePeriod * i);
+                }).
+                y(function (d, i) {
+                    return y(d);
+                }).
+                interpolate("linear");
 
-var cos_phase = Math.cos(-phase)
-var sin_phase = Math.sin(-phase)
-var normalizedTimeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(xdata[i] * cos_phase - ydata[i] * sin_phase); }).
-    interpolate("linear");
+        var cos_phase = Math.cos(-phase)
+        var sin_phase = Math.sin(-phase)
+        var normalizedTimeLine = d3.svg.line().
+                x(function (d, i) {
+                    return x(samplePeriod * i);
+                }).
+                y(function (d, i) {
+                    return y(xdata[i] * cos_phase - ydata[i] * sin_phase);
+                }).
+                interpolate("linear");
 
-  dataGroup.append("svg:path").
-    attr("d", timeLine(xdata)).
-    style("stroke", "green").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", timeLine(xdata)).
+                style("stroke", "green").
+                style("fill", "none");
 
-  dataGroup.append("svg:path").
-    attr("d", timeLine(ydata)).
-    style("stroke", "red").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", timeLine(ydata)).
+                style("stroke", "red").
+                style("fill", "none");
 
-  dataGroup.append("svg:path").
-    attr("d", normalizedTimeLine(xdata)).
-    style("stroke", "blue").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", normalizedTimeLine(xdata)).
+                style("stroke", "blue").
+                style("fill", "none");
 
-var timeAxisGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
+        var timeAxisGroup = waveformPlot.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-timeAxisGroup.selectAll(".yTicks").
-  data(d3.range(-1, 2)).
-  enter().
-  append("svg:line").
-  attr("x1", -5).
-  attr("y1", function(d) {return y(d);}).
-  attr("x2", x(0)).
-  attr("y2", function(d) {return y(d);}).
-  style("stroke", "black").
-  attr("class", "ytics");
+        timeAxisGroup.selectAll(".yTicks").
+                data(d3.range(-1, 2)).
+                enter().
+                append("svg:line").
+                attr("x1", -5).
+                attr("y1",function (d) {
+                    return y(d);
+                }).
+                attr("x2", x(0)).
+                attr("y2",function (d) {
+                    return y(d);
+                }).
+                style("stroke", "black").
+                attr("class", "ytics");
 
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", height - y(0)).
-  attr("x2", x(xdata.length * samplePeriod)).
-  attr("y2", height - y(0)).
-  style("stroke", "black");
+        timeAxisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", height - y(0)).
+                attr("x2", x(xdata.length * samplePeriod)).
+                attr("y2", height - y(0)).
+                style("stroke", "black");
 
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", y(1)).
-  attr("x2", x(0)).
-  attr("y2", y(-1)).
-  style("stroke", "black");
+        timeAxisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", y(1)).
+                attr("x2", x(0)).
+                attr("y2", y(-1)).
+                style("stroke", "black");
 
-width = totalHeight;
-height = totalHeight;
+        width = totalHeight;
+        height = totalHeight;
 
-x = d3.scale.linear().domain([-1, 1]).range([0, width-1]);
-y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
+        x = d3.scale.linear().domain([-1, 1]).range([0, width - 1]);
+        y = d3.scale.linear().domain([-1, 1]).range([height - 1, 0]);
 
-$("#xy_plot").empty();
-var xyPlot = d3.select("#xy_plot").
-  append("svg:svg").
-  attr("width", width).
-  attr("height", height);
+        $("#xy_plot").empty();
+        var xyPlot = d3.select("#xy_plot").
+                append("svg:svg").
+                attr("width", width).
+                attr("height", height);
 
-var xyPhaseGroup = xyPlot.append("svg:g");
-  xyPhaseGroup.append("svg:line").
-    attr("x1", x(cos_phase)).
-    attr("y1", y(-sin_phase)).
-    attr("x2", x(-cos_phase)).
-    attr("y2", y(sin_phase)).
-    style("stroke", "gray").
-    style("stroke-dasharray", "5 5").
-    style("fill", "none");
+        var xyPhaseGroup = xyPlot.append("svg:g");
+        xyPhaseGroup.append("svg:line").
+                attr("x1", x(cos_phase)).
+                attr("y1", y(-sin_phase)).
+                attr("x2", x(-cos_phase)).
+                attr("y2", y(sin_phase)).
+                style("stroke", "gray").
+                style("stroke-dasharray", "5 5").
+                style("fill", "none");
 
-var xyDataGroup = xyPlot.append("svg:g");
+        var xyDataGroup = xyPlot.append("svg:g");
 
-var xyLine = d3.svg.line().
-    x(function(d) { return x(d); }).
-    y(function(d,i) { return y(ydata[i]); }).
-    interpolate("linear");
+        var xyLine = d3.svg.line().
+                x(function (d) {
+                    return x(d);
+                }).
+                y(function (d, i) {
+                    return y(ydata[i]);
+                }).
+                interpolate("linear");
 
-  xyDataGroup.append("svg:path").
-    attr("d", xyLine(xdata)).
-    style("stroke", "blue").
-    style("fill", "none");
+        xyDataGroup.append("svg:path").
+                attr("d", xyLine(xdata)).
+                style("stroke", "blue").
+                style("fill", "none");
 
 
-var xyAxisGroup = xyPlot.append("svg:g");
+        var xyAxisGroup = xyPlot.append("svg:g");
 
-xyAxisGroup.
-  append("svg:line").
-  attr("x1", x(-1)).
-  attr("y1", y(0)).
-  attr("x2", x(1)).
-  attr("y2", y(0)).
-  style("stroke", "black");
+        xyAxisGroup.
+                append("svg:line").
+                attr("x1", x(-1)).
+                attr("y1", y(0)).
+                attr("x2", x(1)).
+                attr("y2", y(0)).
+                style("stroke", "black");
 
-xyAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", y(1)).
-  attr("x2", x(0)).
-  attr("y2", y(-1)).
-  style("stroke", "black");
+        xyAxisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", y(1)).
+                attr("x2", x(0)).
+                attr("y2", y(-1)).
+                style("stroke", "black");
 
-var width = totalWidth - padding;
-var height = totalHeight;
+        var width = totalWidth - padding;
+        var height = totalHeight;
 
-var x = d3.scale.linear().domain([0, xdata.length / samplePeriod]).range([0, width-1]);
-var y = d3.scale.linear().domain([0, 1]).range([height-1, 0]);
+        var x = d3.scale.linear().domain([0, xdata.length / samplePeriod]).range([0, width - 1]);
+        var y = d3.scale.linear().domain([0, 1]).range([height - 1, 0]);
 
-$("#spectrum_plot").empty();
-var waveformPlot = d3.select("#spectrum_plot").
-  append("svg:svg").
-  attr("width", totalWidth).
-  attr("height", totalHeight);
+        $("#spectrum_plot").empty();
+        var waveformPlot = d3.select("#spectrum_plot").
+                append("svg:svg").
+                attr("width", totalWidth).
+                attr("height", totalHeight);
 
-var dataGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
+        var dataGroup = waveformPlot.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-var timeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(d); }).
-    interpolate("linear");
+        var timeLine = d3.svg.line().
+                x(function (d, i) {
+                    return x(samplePeriod * i);
+                }).
+                y(function (d, i) {
+                    return y(d);
+                }).
+                interpolate("linear");
 
-var cos_phase = Math.cos(-phase)
-var sin_phase = Math.sin(-phase)
-var normalizedTimeLine = d3.svg.line().
-    x(function(d, i) { return x(samplePeriod * i); }).
-    y(function(d, i) { return y(xdata[i] * cos_phase - ydata[i] * sin_phase); }).
-    interpolate("linear");
+        var cos_phase = Math.cos(-phase)
+        var sin_phase = Math.sin(-phase)
+        var normalizedTimeLine = d3.svg.line().
+                x(function (d, i) {
+                    return x(samplePeriod * i);
+                }).
+                y(function (d, i) {
+                    return y(xdata[i] * cos_phase - ydata[i] * sin_phase);
+                }).
+                interpolate("linear");
 
-  dataGroup.append("svg:path").
-    attr("d", timeLine(xdata)).
-    style("stroke", "green").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", timeLine(xdata)).
+                style("stroke", "green").
+                style("fill", "none");
 
-  dataGroup.append("svg:path").
-    attr("d", timeLine(ydata)).
-    style("stroke", "red").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", timeLine(ydata)).
+                style("stroke", "red").
+                style("fill", "none");
 
-  dataGroup.append("svg:path").
-    attr("d", normalizedTimeLine(xdata)).
-    style("stroke", "blue").
-    style("fill", "none");
+        dataGroup.append("svg:path").
+                attr("d", normalizedTimeLine(xdata)).
+                style("stroke", "blue").
+                style("fill", "none");
 
-var timeAxisGroup = waveformPlot.append("svg:g").
-  attr("transform", "translate("+padding+",0)");
+        var timeAxisGroup = waveformPlot.append("svg:g").
+                attr("transform", "translate(" + padding + ",0)");
 
-timeAxisGroup.selectAll(".yTicks").
-  data(d3.range(-1, 2)).
-  enter().
-  append("svg:line").
-  attr("x1", -5).
-  attr("y1", function(d) {return y(d);}).
-  attr("x2", x(0)).
-  attr("y2", function(d) {return y(d);}).
-  style("stroke", "black").
-  attr("class", "ytics");
+        timeAxisGroup.selectAll(".yTicks").
+                data(d3.range(-1, 2)).
+                enter().
+                append("svg:line").
+                attr("x1", -5).
+                attr("y1",function (d) {
+                    return y(d);
+                }).
+                attr("x2", x(0)).
+                attr("y2",function (d) {
+                    return y(d);
+                }).
+                style("stroke", "black").
+                attr("class", "ytics");
 
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", height - y(0)).
-  attr("x2", x(xdata.length * samplePeriod)).
-  attr("y2", height - y(0)).
-  style("stroke", "black");
+        timeAxisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", height - y(0)).
+                attr("x2", x(xdata.length * samplePeriod)).
+                attr("y2", height - y(0)).
+                style("stroke", "black");
 
-timeAxisGroup.
-  append("svg:line").
-  attr("x1", x(0)).
-  attr("y1", y(1)).
-  attr("x2", x(0)).
-  attr("y2", y(-1)).
-  style("stroke", "black");
-});
+        timeAxisGroup.
+                append("svg:line").
+                attr("x1", x(0)).
+                attr("y1", y(1)).
+                attr("x2", x(0)).
+                attr("y2", y(-1)).
+                style("stroke", "black");
+    });
 }
 updateCurrentWaveform();
-setInterval("updateCurrentWaveform()", 2000); 
+setInterval("updateCurrentWaveform()", 2000);
 
 </script>
 
 <script type="text/javascript">
 
-$('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}">');
+    $('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}"/>');
 
-function updateAmplitudeDirectionPlot() {
-  $.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function(result) {
+    function updateAmplitudeDirectionPlot() {
+        $.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function (result) {
 
-  var data = new Array();
+            var data;
+            data = [];
 
-  $.each(result, function(index, event) {
-    var maxAmplitude = event[6];
-    var phase = event[7];
-    var value = new Object();
-    value.x = maxAmplitude * Math.cos(phase);
-    value.y = maxAmplitude * Math.sin(phase);
-    data.push(value);
-  });
+            $.each(result, function (index, event) {
+                var maxAmplitude = event[6];
+                var phase = event[7];
+                var value = new Object();
+                value.x = maxAmplitude * Math.cos(phase);
+                value.y = maxAmplitude * Math.sin(phase);
+                data.push(value);
+            });
 
-  var width = 300;
-  var height = 300;
+            var width = 300;
+            var height = 300;
 
-  var x = d3.scale.linear().domain([-1, 1]).range([0, width-1]);
-  var y = d3.scale.linear().domain([-1, 1]).range([height-1, 0]);
+            var x = d3.scale.linear().domain([-1, 1]).range([0, width - 1]);
+            var y = d3.scale.linear().domain([-1, 1]).range([height - 1, 0]);
 
-  $('#amplitude_direction_plot').empty();
+            $('#amplitude_direction_plot').empty();
 
-  var polarPlot = d3.select("#amplitude_direction_plot").
-    append("svg:svg").
-    attr("width", width).
-    attr("height", height);
+            var polarPlot = d3.select("#amplitude_direction_plot").
+                    append("svg:svg").
+                    attr("width", width).
+                    attr("height", height);
 
-  var dataGroup = polarPlot.append("svg:g");
-    dataGroup.selectAll("path.dot").
-    data(data).
-    enter().
-    append("svn:path").
-    attr("class", "dot").
-    attr("stroke", "none").
-    attr("fill", "green").
-    attr("transform", function(d) { return "translate(" + x(d.x) + ", " + y(d.y) + ")"; }).
-    attr("d", d3.svg.symbol().type("cross").size(15));
+            var dataGroup = polarPlot.append("svg:g");
+            dataGroup.selectAll("path.dot").
+                    data(data).
+                    enter().
+                    append("svn:path").
+                    attr("class", "dot").
+                    attr("stroke", "none").
+                    attr("fill", "green").
+                    attr("transform",function (d) {
+                        return "translate(" + x(d.x) + ", " + y(d.y) + ")";
+                    }).
+                    attr("d", d3.svg.symbol().type("cross").size(15));
 
-  var axisGroup = polarPlot.append("svg:g");
+            var axisGroup = polarPlot.append("svg:g");
 
-  axisGroup.
-    append("svg:line").
-    attr("x1", x(-1)).
-    attr("y1", y(0)).
-    attr("x2", x(1)).
-    attr("y2", y(0)).
-    style("stroke", "black");
+            axisGroup.
+                    append("svg:line").
+                    attr("x1", x(-1)).
+                    attr("y1", y(0)).
+                    attr("x2", x(1)).
+                    attr("y2", y(0)).
+                    style("stroke", "black");
 
-  axisGroup.
-    append("svg:line").
-    attr("x1", x(0)).
-    attr("y1", y(1)).
-    attr("x2", x(0)).
-    attr("y2", y(-1)).
-    style("stroke", "black");
+            axisGroup.
+                    append("svg:line").
+                    attr("x1", x(0)).
+                    attr("y1", y(1)).
+                    attr("x2", x(0)).
+                    attr("y2", y(-1)).
+                    style("stroke", "black");
 
-  });
-}
-updateAmplitudeDirectionPlot();
-setInterval("updateAmplitudeDirectionPlot()", 300000); 
+        });
+    }
+    updateAmplitudeDirectionPlot();
+    setInterval("updateAmplitudeDirectionPlot()", 300000);
 </script>
 

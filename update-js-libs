@@ -6,10 +6,11 @@ wget http://code.jquery.com/jquery.min.js -O $TARGETDIR/jquery.js
 wget http://mbostock.github.com/d3/d3.v2.min.js  -O $TARGETDIR/d3.js
 wget https://raw.github.com/corbanbrook/dsp.js/master/dsp.js -O $TARGETDIR/dsp.js
 
-SLICKGRID_ARCHIVE=$(mktemp --suffix=_slickgrid.tar.gz)
-wget https://github.com/mleibman/SlickGrid/tarball/2.0.1 -O $SLICKGRID_ARCHIVE
+SLICKGRID_ARCHIVE=$(mktemp /tmp/slickgrid_tar_gz_XXXXXXXXXX)
+wget https://github.com/mleibman/SlickGrid/archive/2.02.tar.gz -O $SLICKGRID_ARCHIVE
 tar xvzf $SLICKGRID_ARCHIVE --strip-components 1 --no-anchored -C $TARGETDIR slick.core.js
 rm -rf $SLICKGRID_ARCHIVE
 
-JQUERY_UI_ARCHIVE=$(mktemp --suffix=_jquery_ui.zip)
+JQUERY_UI_ARCHIVE=$(mktemp /tmp/jquery_ui_zip_XXXXXXXXXX)
+echo $JQUERY_UI_ARCHIVE
 wget http://jqueryui.com/download/jquery-ui-1.8.20.custom.zip -O $JQUERY_UI_ARCHIVE
