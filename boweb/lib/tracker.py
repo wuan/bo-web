@@ -38,7 +38,7 @@ class Connection(object):
         if json_object is not None:
             if path:
                 for component in path.split('/'):
-                    if json_object.has_key(component):
+                    if component in json_object:
                         json_object = json_object[component]
                     else:
                         json_object = None
