@@ -51,12 +51,10 @@ def get_data_raw_time(start, end=""):
     cache_item = 'boweb_raw_time_%s_%s' % (start, end)
 
     data = cache.get(cache_item)
-
     if not data:
         pipe = subprocess.Popen(['bo-data', '-i', data_file, '-s', start, '--json'], stdout=subprocess.PIPE)
-
-    (data, _) = pipe.communicate()
-    cache.set(cache_item, data, timeout=300)
+        data, _ = pipe.communicate()
+        cache.set(cache_item, data, timeout=300)
 
     return data
 
