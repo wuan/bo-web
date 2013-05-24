@@ -6,7 +6,7 @@ mkdir -p $TARGETDIR
 wget http://code.jquery.com/jquery.min.js -O $TARGETDIR/jquery.min.js
 wget http://mbostock.github.com/d3/d3.v2.min.js  -O $TARGETDIR/d3.v2.min.js
 wget https://raw.github.com/corbanbrook/dsp.js/master/dsp.js -O $TARGETDIR/dsp.js
-wget https://raw.github.com/cloudhead/less.js/master/dist/less-1.3.3.min.js -O $TARGETDIR/less-1.3.3.min..js
+wget https://raw.github.com/cloudhead/less.js/master/dist/less-1.3.3.min.js -O $TARGETDIR/less-1.3.3.min.js
 
 SLICKGRID_ARCHIVE=$(mktemp /tmp/slickgrid_tar_gz_XXXXXXXXXX)
 wget https://github.com/mleibman/SlickGrid/archive/2.02.tar.gz -O $SLICKGRID_ARCHIVE

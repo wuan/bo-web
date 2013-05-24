@@ -36,7 +36,7 @@
         $.getJSON($SCRIPT_ROOT + '/data/_get_histogram/' + date, function (data) {
 
             var totalWidth = 400;
-            var yAxisWidth = 30;
+            var yAxisWidth = 40;
 
             var chartWidth = totalWidth - yAxisWidth;
             var barWidth = chartWidth / data.y.length;
@@ -70,8 +70,9 @@
                     attr("height",function (datum, index) {
                         return yScale(datum);
                     }).
-                    attr("width", barWidth).
-                    attr("fill", "#2d578b");
+                    attr("width", barWidth)
+                    .attr("transform", "translate(" + yAxisWidth + ", 0)")
+                    .attr("fill", "#2d578b");
 
             var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5)
             barChart.append("svg:g")
