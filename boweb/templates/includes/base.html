@@ -1,6 +1,6 @@
 <link rel=stylesheet type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
-<script type="text/javascript" src="{{ url_for('static', filename='jslib/jquery.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='jslib/d3.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jslib/jquery.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jslib/d3.v2.min.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='jslib/dsp.js') }}"></script>
 <script type="text/javascript">
     $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
