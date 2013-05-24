@@ -13,8 +13,8 @@
                             $.each(data.result, function (index, date) {
                                 items.push(new Option(date, date, index == 0, index == 0));
                             });
-                            $('#result').html(items);
-                            $('#result').change();
+                            $('#result').html(items)
+                                        .change();
                         });
                 return true;
             });
@@ -35,34 +35,49 @@
 
         $.getJSON($SCRIPT_ROOT + '/data/_get_histogram/' + date, function (data) {
 
-            var width = 400;
-            var barWidth = width / data.y.length;
-            var height = 200;
+            var totalWidth = 400;
+            var yAxisWidth = 30;
+
+            var chartWidth = totalWidth - yAxisWidth;
+            var barWidth = chartWidth / data.y.length;
+            var chartHeight = 200;
 
             $('#histogram').empty();
-            var barDemo = d3.select("#histogram").
-                    append("svg:svg").
-                    attr("width", width).
-                    attr("height", height);
+            var barChart = d3.select("#histogram")
+                    .append("svg:svg")
+                    .attr("width", chartWidth)
+                    .attr("height", chartHeight)
+                    .attr("transform", "translate(" + yAxisWidth + ", 0)");
 
-            var x = d3.scale.linear().domain([0, data.x.length]).range([0, width]);
-            var y = d3.scale.linear().domain([0, d3.max(data.y)]).range([0, height]);
 
-            barDemo.selectAll("rect").
+            var xScale = d3.scale.linear()
+                                 .domain([0, data.x.length])
+                                 .range([0, chartWidth]);
+            var yScale = d3.scale.linear()
+                                 .domain([0, d3.max(data.y)])
+                                 .range([0, chartHeight]);
+
+            barChart.selectAll("rect").
                     data(data.y).
                     enter().
                     append("svg:rect").
                     attr("x",function (datum, index) {
-                        return x(index);
+                        return xScale(index);
                     }).
                     attr("y",function (datum, index) {
-                        return height - y(datum);
+                        return chartHeight - yScale(datum);
                     }).
                     attr("height",function (datum, index) {
-                        return y(datum);
+                        return yScale(datum);
                     }).
                     attr("width", barWidth).
                     attr("fill", "#2d578b");
+
+            var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5)
+            barChart.append("svg:g")
+                   .attr("class", "axis")
+                   .attr("transform", "translate(" + yAxisWidth + ", 0)")
+                   .call(yAxis);
         });
     }
 </script>
