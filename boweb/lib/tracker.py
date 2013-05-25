@@ -55,4 +55,4 @@ class Activity(Connection):
 
 class Info(Connection):
     def __init__(self, socket_file=Connection.socket_file):
-        super(Info, self).__init__('getInfo', socket_file, 'info')
+        super(Info, self).__init__('getInfo', socket_file)
