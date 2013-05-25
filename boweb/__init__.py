@@ -8,11 +8,11 @@ logger = logging.getLogger('app')
 
 app = Flask(__name__)
 
-from boweb.views.tracker import tracker
-from boweb.views.data import data
+from boweb.views.tracker import TRACKER
+from boweb.views.data import DATA
 
-app.register_blueprint(tracker)
-app.register_blueprint(data)
+app.register_blueprint(TRACKER)
+app.register_blueprint(DATA)
 
 @app.route('/')
 def index():

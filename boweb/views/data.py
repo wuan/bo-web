@@ -6,7 +6,7 @@ from flask import Blueprint, render_template, current_app, jsonify
 import blitzortung
 
 
-data = Blueprint('data', __name__, url_prefix='/data')
+DATA = Blueprint('data', __name__, url_prefix='/data')
 
 
 def get_raw_files():
@@ -23,12 +23,12 @@ def get_raw_files():
     return raw_files
 
 
-@data.route('/')
+@DATA.route('/')
 def index():
     return render_template('data/index.html')
 
 
-@data.route('/_get_date')
+@DATA.route('/_get_date')
 def get_dates():
     date_strings = []
     for date in get_raw_files().get_dates():
@@ -37,7 +37,7 @@ def get_dates():
     return jsonify(result=date_strings)
 
 
-@data.route('/_get_date/<date>')
+@DATA.route('/_get_date/<date>')
 def get_date(date):
     date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
     data_file = get_raw_files().get(date)
@@ -48,7 +48,7 @@ def get_date(date):
     return jsonify(total=int(results[0]), avg_amp=float(results[1]))
 
 
-@data.route('/_get_histogram/<date>')
+@DATA.route('/_get_histogram/<date>')
 def get_histogram(date):
     date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
     data_file = get_raw_files().get(date)
@@ -64,8 +64,8 @@ def get_histogram(date):
     return jsonify(x=x, y=y)
 
 
-@data.route('/raw/<start>')
-@data.route('/raw/<start>/<length>')
+@DATA.route('/raw/<start>')
+@DATA.route('/raw/<start>/<length>')
 def get_data_raw(start, length="-1"):
     date = datetime.datetime.utcnow().date()
     data_file = get_raw_files().get(date)
@@ -76,8 +76,8 @@ def get_data_raw(start, length="-1"):
     return output
 
 
-@data.route('/raw/time/<start>')
-@data.route('/raw/time/<start>/<end>')
+@DATA.route('/raw/time/<start>')
+@DATA.route('/raw/time/<start>/<end>')
 def get_data_raw_time(start, end=""):
     start_time = int(start)
     now = datetime.datetime.utcnow()
@@ -101,8 +101,8 @@ def get_data_raw_time(start, end=""):
     return data
 
 
-@data.route('/raw/long/<start>')
-@data.route('/raw/long/<start>/<length>')
+@DATA.route('/raw/long/<start>')
+@DATA.route('/raw/long/<start>/<length>')
 def get_data_raw_long(start, length="-1"):
     date = datetime.datetime.utcnow().date()
     data_file = get_raw_files().get(date)
@@ -113,8 +113,8 @@ def get_data_raw_long(start, length="-1"):
     return output
 
 
-@data.route('/raw/normalized/<start>')
-@data.route('/raw/normalized/<start>/<length>')
+@DATA.route('/raw/normalized/<start>')
+@DATA.route('/raw/normalized/<start>/<length>')
 def get_data_raw_normalized(start, length="-1"):
     date = datetime.datetime.utcnow().date()
     data_file = get_raw_files().get(date)
