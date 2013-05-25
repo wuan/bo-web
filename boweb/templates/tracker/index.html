@@ -65,7 +65,7 @@
 <script type="text/javascript">
 
 function updateTrackerInfo() {
-    $.getJSON($SCRIPT_ROOT + '/backend/tracker/info', function (data) {
+    $.getJSON($SCRIPT_ROOT + '/tracker/info', function (data) {
         $('#tracker_uptime').text(data['process']['uptime']);
         $('#tracker_version').html(data['software']['version']);
         $('#pcb_firmware').text(data['hardware']['firmware']);
@@ -84,7 +84,7 @@ updateTrackerInfo();
 setInterval("updateTrackerInfo()", 10000);
 
 function updateActivityPlot() {
-    $.getJSON($SCRIPT_ROOT + '/backend/tracker/activity', function (data) {
+    $.getJSON($SCRIPT_ROOT + '/tracker/activity', function (data) {
 
         var totalWidth = 400;
         var totalHeight = 200;
@@ -149,7 +149,7 @@ updateActivityPlot();
 setInterval("updateActivityPlot()", 60000);
 
 function updateCurrentWaveform() {
-    $.getJSON($SCRIPT_ROOT + '/backend/data/raw/long/-1', function (data) {
+    $.getJSON($SCRIPT_ROOT + '/data/raw/long/-1', function (data) {
         var eventInfo = data[0];
         var samplePeriod = eventInfo[5] / 1000;
         var maxAmplitude = eventInfo[6] / Math.sqrt(2) * 100
@@ -381,7 +381,7 @@ setInterval("updateCurrentWaveform()", 2000);
     $('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}"/>');
 
     function updateAmplitudeDirectionPlot() {
-        $.getJSON($SCRIPT_ROOT + '/backend/data/raw/time/-60', function (result) {
+        $.getJSON($SCRIPT_ROOT + '/data/raw/time/-60', function (result) {
 
             var data;
             data = [];

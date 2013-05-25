@@ -60,3 +60,78 @@ def get_histogram(date):
     x.append(float(result[0]))
     y.append(int(result[1]))
   return jsonify(x=x, y=y)
+
+@data.route('/data/raw/<start>')
+@data.route('/data/raw/<start>/<length>')
+def get_data_raw(start, length="-1"):
+    date = datetime.datetime.utcnow().date()
+    data_file = get_raw_files().get(date)
+
+    data = subprocess.Popen(['bo-data', '-i', data_file, '--start', start, '--number', length, '--json'],
+                            stdout=subprocess.PIPE)
+    (output, _) = data.communicate()
+    return output
+
+
+@data.route('/data/raw/time/<start>')
+@data.route('/data/raw/time/<start>/<end>')
+def get_data_raw_time(start, end=""):
+    start_time = int(start)
+    now = datetime.datetime.utcnow()
+    date = now.date()
+    if start_time < 0:
+        start_timestamp = now + datetime.timedelta(minutes=start_time)
+        if now.date() != start_timestamp.date():
+            start_timestamp = datetime.datetime.combine(now.date(), datetime.time(0, 0, 0))
+        start = start_timestamp.strftime("%H%M%S")
+    data_file = get_raw_files().get(date)
+
+    cache = current_app.config['cache']
+    cache_item = 'boweb_raw_time_%s_%s' % (start, end)
+
+    data = cache.get(cache_item)
+    if not data:
+        pipe = subprocess.Popen(['bo-data', '-i', data_file, '-s', start, '--json'], stdout=subprocess.PIPE)
+        data, _ = pipe.communicate()
+        cache.set(cache_item, data, timeout=300)
+
+    return data
+
+
+@data.route('/data/raw/long/<start>')
+@data.route('/data/raw/long/<start>/<length>')
+def get_data_raw_long(start, length="-1"):
+    date = datetime.datetime.utcnow().date()
+    data_file = get_raw_files().get(date)
+
+    data = subprocess.Popen(['bo-data', '-i', data_file, '--start', start, '--number', length, '--long-data', '--json'],
+                            stdout=subprocess.PIPE)
+    (output, _) = data.communicate()
+    return output
+
+
+@data.route('/data/raw/normalized/<start>')
+@data.route('/data/raw/normalized/<start>/<length>')
+def get_data_raw_normalized(start, length="-1"):
+    date = datetime.datetime.utcnow().date()
+    data_file = get_raw_files().get(date)
+
+    data = subprocess.Popen(
+        ['bo-data', '-i', data_file, '--start', start, '--number', length, '--long-data', '--normalize', '--json'],
+        stdout=subprocess.PIPE)
+    (output, _) = data.communicate()
+    return output
+
+
+def get_raw_files():
+    cache = current_app.config['cache']
+    cache_item = 'boweb_raw_files'
+
+    raw_files = cache.get(cache_item)
+
+    if not raw_files:
+        raw_data_path = '/var/cache/blitzortung/raw'
+        raw_files = blitzortung.files.Raw(raw_data_path)
+        cache.set(cache_item, raw_files, timeout=300)
+
+    return raw_files
