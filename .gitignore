@@ -1,3 +1,4 @@
 .idea
 bowebenv
 *.pyc
+boweb/static/jslib
