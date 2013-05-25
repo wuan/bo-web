@@ -6,8 +6,8 @@ class Connection(object):
 
     socket_file = '/tmp/.blitzortung-tracker'
 
-    def __init__(self, command, socket_file=socket_file):
-
+    def __init__(self, command, socket_file=socket_file, default_path=None):
+        self.default_path = default_path
         try:
             tracker_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
             tracker_socket.connect(socket_file)
@@ -35,6 +35,8 @@ class Connection(object):
     def get_result(self, path=None):
         json_object = self.json_object
 
+        path = path if path else self.default_path
+
         if json_object is not None:
             if path:
                 for component in path.split('/'):
@@ -48,15 +50,9 @@ class Connection(object):
 
 class Activity(Connection):
     def __init__(self, socket_file=Connection.socket_file):
-        Connection.__init__(self, 'getActivity', socket_file)
-
-    def get(self):
-        if self.json_object:
-            if 'activity' in self.json_object:
-                return self.json_object['activity']
-        return []
+        super(Activity, self).__init__('getActivity', socket_file, 'activity')
 
 
 class Info(Connection):
     def __init__(self, socket_file=Connection.socket_file):
-        Connection.__init__(self, 'getInfo', socket_file)
+        super(Info, self).__init__('getInfo', socket_file, 'info')
