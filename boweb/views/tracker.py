@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint, render_template
 
-import blitzortung
+import blitzortung.db
 import boweb
 
 
@@ -20,7 +20,6 @@ def index():
 def get_tracker_status():
     info = boweb.lib.tracker.Info()
     return json.dumps(info.get_result())
-
 
 @TRACKER.route('/activity')
 def get_tracker_activity():
