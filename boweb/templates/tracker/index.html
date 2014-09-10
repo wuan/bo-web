@@ -343,8 +343,8 @@ function updateCurrentWaveform() {
                 }).
                 interpolate("linear");
 
-        var cos_phase = Math.cos(-phase)
-        var sin_phase = Math.sin(-phase)
+        var cos_phase = Math.cos(-phase);
+        var sin_phase = Math.sin(-phase);
         var normalizedTimeLine = d3.svg.line().
                 x(function (d, i) {
                     return xScale(samplePeriod * i);
