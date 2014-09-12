@@ -16,6 +16,7 @@ app.register_blueprint(TRACKER)
 app.register_blueprint(DATA)
 app.register_blueprint(SERVER)
 
+
 @app.route('/')
 def index():
     return render_template('index.html')

@@ -18,7 +18,7 @@
 <h2>Cluster Map</h2>
 
 <div id="map" class="map"></div>
-<input type="button" name="redraw" onClick="vector_layer.getSource().load()"/>
+<input type="button" name="redraw" onClick="cluster_layer.getSource().load()"/>
 
 <script type="text/javascript">
 
@@ -31,22 +31,43 @@
         'rgba(184, 46, 45, 1.0)',
     ];
 
+
     var styleFunction = function (feature, resolution) {
-        timedelta = feature.getProperties().timedelta;
+                var timedelta = feature.getProperties().timedelta;
 
-        return [new ol.style.Style({
-            stroke: new ol.style.Stroke({
-                color: colors[timedelta],
-                width: (timedelta === 0 ? 2 : 1)
-            })
-        })]
-    };
+                var type = feature.getGeometry().getType();
 
-    var vector_layer = new ol.layer.Vector({
+                if (type == 'Point') {
+                    return [new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 1,
+                            fill: null,
+                            stroke: new ol.style.Stroke({color: colors[timedelta], width: 1})
+                        })
+                    })];
+                } else {
+                    return [new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: colors[timedelta],
+                            width: (timedelta === 0 ? 2 : 1)
+                        })
+                    })]
+                }
+            };
+
+    var strike_layer = new ol.layer.Vector({
         projection: 'EPSG:3857',
-        defaultProjection: 'EPSG:4326',
         source: new ol.source.GeoJSON({
-            url: './data/current'
+            url: './data/strikes'
+        }),
+        style: styleFunction,
+        reloadInterval: 1000
+    });
+
+    var cluster_layer = new ol.layer.Vector({
+        projection: 'EPSG:3857',
+        source: new ol.source.GeoJSON({
+            url: './data/clusters'
         }),
         style: styleFunction,
         reloadInterval: 1000
@@ -58,7 +79,8 @@
             new ol.layer.Tile({
                 source: new ol.source.MapQuest({layer: 'sat'})
             }),
-            vector_layer
+            strike_layer,
+            cluster_layer
         ],
         view: new ol.View({
             center: ol.proj.transform([11, 49], 'EPSG:4326', 'EPSG:3857'),

@@ -1,9 +1,11 @@
 import json
 import datetime
+from blitzortung.db.query import TimeInterval
 
 from flask import Blueprint, render_template
 
 import blitzortung.db
+import pytz
 import boweb
 from shapely.geometry import mapping
 
@@ -23,13 +25,44 @@ def get_server_status():
     return json.dumps(info.get_result())
 
 
-@SERVER.route('/data/current')
-def get_current_data():
+@SERVER.route('/data/strikes')
+def get_strikes_data():
+    strike_db = blitzortung.db.strike()
+    strike_db.set_srid(3857)
+
+    interval_duration = datetime.timedelta(minutes=10)
+
+    current_time = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
+
+    strikes = strike_db.select(TimeInterval(current_time - datetime.timedelta(minutes=60)))
+
+    features = [
+        {
+            'type': 'Feature',
+            'geometry': {"type": "Point", "coordinates": [strike.get_x(), strike.get_y()]},
+            'properties': {'timedelta': int(
+                (current_time - strike.get_timestamp()).total_seconds() / interval_duration.total_seconds())}
+        } for strike in strikes]
+
+    result = {
+        'type': 'FeatureCollection',
+        'features': features
+    }
+    return json.dumps(result)
+
+
+@SERVER.route('/data/clusters')
+def get_clusters_data():
     cluster_db = blitzortung.db.strike_cluster()
     cluster_db.set_srid(3857)
 
     current_time = cluster_db.get_latest_time()
-
+    current_time = datetime.datetime.utcnow().replace(
+        second=0,
+        microsecond=0,
+        tzinfo=pytz.UTC
+    )
+    print current_time
     interval_duration = datetime.timedelta(minutes=10)
     clusters = cluster_db.select(current_time, interval_duration, 6, interval_duration)
 
@@ -37,17 +70,12 @@ def get_current_data():
         {
             'type': 'Feature',
             'geometry': mapping(cluster.get_shape()),
-            'properties': {'timedelta': int((current_time - cluster.get_timestamp()).total_seconds() / interval_duration.total_seconds())}
+            'properties': {'timedelta': int(
+                (current_time - cluster.get_timestamp()).total_seconds() / interval_duration.total_seconds())}
         } for cluster in clusters]
 
     result = {
         'type': 'FeatureCollection',
-        'crs': {
-            'type': 'name',
-            'properties': {
-                'name': 'EPSG:4326'
-            }
-        },
         'features': features
     }
     return json.dumps(result)
