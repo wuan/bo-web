@@ -56,13 +56,17 @@ def get_clusters_data():
     cluster_db = blitzortung.db.strike_cluster()
     cluster_db.set_srid(3857)
 
-    current_time = cluster_db.get_latest_time()
+    last_cluster_time = cluster_db.get_latest_time()
+
     current_time = datetime.datetime.utcnow().replace(
         second=0,
         microsecond=0,
         tzinfo=pytz.UTC
     )
-    print current_time
+
+    if current_time - last_cluster_time == datetime.timedelta(minutes=1):
+        current_time = last_cluster_time
+
     interval_duration = datetime.timedelta(minutes=10)
     clusters = cluster_db.select(current_time, interval_duration, 6, interval_duration)
 
