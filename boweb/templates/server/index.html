@@ -1,18 +1,21 @@
-<!doctype html>
-<html>
-<title>Server Overview</title>
-{% include 'includes/head.html' %}
-<link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css" type="text/css">
-<style>
-    .map {
-        height: 800px;
-        width: 100%;
-    }
-</style>
-<script src="http://openlayers.org/en/v3.0.0/build/ol.js" type="text/javascript"></script>
+{% extends "includes/layout.html" %}
+{% set active_page = "server" %}
 
-<body role="document">
+{% block title %}Server{% endblock %}
 
+{% block head %}
+{{ super() }}
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.0.0/css/ol.css" type="text/css">
+    <style>
+        .map {
+            height: 800px;
+            width: 100%;
+        }
+    </style>
+    <script src="http://openlayers.org/en/v3.0.0/build/ol.js" type="text/javascript"></script>
+{% endblock %}
+
+{% block body %}
 <h1>Server Overview</h1>
 
 <h2>Cluster Map</h2>
@@ -88,7 +91,5 @@
         })
     });
 </script>
+{% endblock %}
 
-
-</body>
-</html>

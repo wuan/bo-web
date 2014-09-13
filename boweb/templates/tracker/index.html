@@ -1,7 +1,9 @@
-<!doctype html>
-<title>Tracker Status</title>
-{% include 'includes/head.html' %}
-<h1>Tracker Status</h1>
+{% extends "includes/layout.html" %}
+{% set active_page = "tracker" %}
+
+{% block title %}Tracker{% endblock %}
+
+{% block body %}
 
 <strong>software:</strong> uptime <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
 <strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span
@@ -439,3 +441,4 @@ setInterval("updateCurrentWaveform()", 2000);
     setInterval("updateAmplitudeDirectionPlot()", 300000);
 </script>
 
+{% endblock %}

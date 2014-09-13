@@ -1,22 +1,27 @@
 <!doctype html>
+<html>
 <head>
-    <title>BO-Web</title>
-    {% include 'includes/head.html' %}
+    {% block head %}
+        <title>boWeb - {% block title %}{% endblock %}</title>
+        {% include 'includes/head.html' %}
+    {% endblock %}
 </head>
-<body>
-<div class=page>
-    <h1>Flaskr</h1>
-
-    <div class=metanav>
-        {% if not session.logged_in %}
-            <a href="{{ url_for('login') }}">log in</a>
-        {% else %}
-            <a href="{{ url_for('logout') }}">log out</a>
-        {% endif %}
-    </div>
+<body role="document">
+{% block navbar %}
+    {% with active_page=active_page %}
+    {% include "includes/navbar.html" %}
+    {% endwith %}
+{% endblock %}
+<div class="container theme-showcase" role="main">
     {% for message in get_flashed_messages() %}
         <div class=flash>{{ message }}</div>
     {% endfor %}
+
     {% block body %}{% endblock %}
+
+    {% block foot %}
+        {% include "includes/foot.html" %}
+    {% endblock %}
 </div>
 </body>
+</html>

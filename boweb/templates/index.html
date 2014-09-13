@@ -1,11 +1,13 @@
-<!doctype html>
-<title>Blitzortung Tracker</title>
-{% include 'includes/head.html' %}
+{% extends "includes/layout.html" %}
+{% set active_page = "index" %}
 
-<h1>Blitzortung Tracker Hauptseite</h1>
+{% block title %}Overview{% endblock %}
 
-<ul>
-    <li><a href="tracker">Tracker</a></li>
-    <li><a href="data">Data</a></li>
-    <li><a href="server">Server</a></li>
-</ul>
+{% block body %}
+
+<div class="jumbotron">
+  <h1>Welcome to boWeb</h1>
+  <p>a simple webapplication to control your blitzortung.org related stuff</p>
+</div>
+
+{% endblock %}

@@ -1,6 +1,9 @@
-<!doctype html>
-<title>Blitzortung Data</title>
-{% include 'includes/head.html' %}
+{% extends "includes/layout.html" %}
+{% set active_page = "data" %}
+
+{% block title %}Data{% endblock %}
+
+{% block body %}
 <h1>Data Overview</h1>
 
 <script type="text/javascript">
@@ -99,3 +102,4 @@
 
 <div id="histogram"></div>
 
+{% endblock %}
