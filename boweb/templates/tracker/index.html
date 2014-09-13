@@ -64,6 +64,13 @@
     </tr>
 </table>
 
+{% endblock %}
+
+{% block foot %}
+{{ super() }}
+<script type="text/javascript" src="{{ url_for('static', filename='jslib/d3.v2.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='jslib/dsp.js') }}"></script>
+
 <script type="text/javascript">
 
 function updateTrackerInfo() {

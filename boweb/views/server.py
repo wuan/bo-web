@@ -1,13 +1,20 @@
 import json
 import datetime
-from blitzortung.db.query import TimeInterval
+try:
+    from blitzortung.db.query import TimeInterval
+except ImportError:
+    class TimeInterval(object):
+        pass
 
 from flask import Blueprint, render_template
 
 import blitzortung.db
 import pytz
 import boweb
-from shapely.geometry import mapping
+try:
+    from shapely.geometry import mapping
+except ImportError:
+    mapping = None
 
 SERVER = Blueprint('server', __name__, url_prefix='/server')
 
