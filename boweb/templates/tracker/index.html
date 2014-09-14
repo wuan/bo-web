@@ -64,29 +64,32 @@
                 <div class="panel-heading">
                     last recorded waveform
                 </div>
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-4>">
+                <table>
+                    <tr>
+                        <td>
                             time-plot
-                        </div>
-                        <div class="col-md-4>">
+                        </td>
+                        <td>
                             xy-plot
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4>">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             <div id="waveform_plot"></div>
-                        </div>
-                        <div class="col-md-4>">
+                        </td>
+                        <td>
                             <div id="xy_plot"></div>
-                        </div>
-                    </div>
-                    <div id="waveform_info"></div>
-                    <div id="spectrum_info"></div>
-                </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div id="waveform_info"></div>
+                            <div id="spectrum_info"></div>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
-    </div>
     </div>
 
 {% endblock %}
