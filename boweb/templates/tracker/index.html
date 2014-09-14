@@ -5,447 +5,472 @@
 
 {% block body %}
 
-<strong>software:</strong> uptime <span id="tracker_uptime"></span>, version: <span id="tracker_version"></span><br/>
-<strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span
-        id="pcb_baudrate"></span>, timer ticks per second <span id="pcb_timer"></span><br/>
-<strong>gps:</strong> position <span id="gps_position"></span>, status <span id="gps_status"></span>, <span
-        id="gps_satelliteCount"></span> satellites in view, type '<span id="gps_hardwareType"></span>', baudrate <span
-        id="gps_baudRate"></span><br/>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">tracker parameters</div>
+                <div class="panel-body">
+                    <strong>software:</strong> uptime <span id="tracker_uptime"></span>, version: <span
+                        id="tracker_version"></span>
+                    <br/>
+                    <strong>hardware:</strong> firmware <span id="pcb_firmware"></span>, baudrate <span
+                        id="pcb_baudrate"></span>, timer ticks per second <span id="pcb_timer"></span><br/>
+                    <strong>gps:</strong> position <span id="gps_position"></span>, status <span id="gps_status"></span>, <span
+                        id="gps_satelliteCount"></span> satellites in view, type '<span id="gps_hardwareType"></span>',
+                    baudrate <span
+                        id="gps_baudRate"></span><br/>
 
-<p></p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<table>
-    <tr>
-        <th colspan="2"> past <span id="activity_range"></span> minutes activity:</th>
-        <th>amplitude/direction of signal maxima</th>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <div id="activity_plot"></div>
-            <table>
-                <tr>
-                    <td align="right"># of events:</td>
-                    <td><span id="activity_numberofevents"></span></td>
-                </tr>
-                <tr>
-                    <td>average events per second:</td>
-                    <td><span id="activity_eventspersecond"></span></td>
-                </tr>
-            </table>
-        </td>
-        <td>
-            <div id="amplitude_direction_plot"></div>
-        </td>
-    </tr>
-    <tr>
-        <th>last recorded waveform:</th>
-    </tr>
-    <tr>
-        <th>time-plot</th>
-        <th>xy-plot</th>
-        <th><!--frequency distribution--></th>
-    </tr>
-    <tr>
-        <td>
-            <div id="waveform_plot"></div>
-        </td>
-        <td>
-            <div id="xy_plot"></div>
-        </td>
-        <td><!--<div id="spectrum_plot"></div>--></td>
-    </tr>
-    <tr>
-        <td colspan="2">
-            <div id="waveform_info"></div>
-        </td>
-        <td>
-            <div id="spectrum_info"></div>
-        </td>
-    </tr>
-</table>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    past <span id="activity_range"></span> minutes activity
+                </div>
+                <div class="panel-body">
+                    <div id="activity_plot"></div>
+                    <table>
+                        <tr>
+                            <td align="right"># of events:</td>
+                            <td><span id="activity_numberofevents"></span></td>
+                        </tr>
+                        <tr>
+                            <td>average events per second:</td>
+                            <td><span id="activity_eventspersecond"></span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    amplitude/direction of signal maxima
+                </div>
+                <div class="panel-body">
+                    <div id="amplitude_direction_plot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    last recorded waveform
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4>">
+                            time-plot
+                        </div>
+                        <div class="col-md-4>">
+                            xy-plot
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4>">
+                            <div id="waveform_plot"></div>
+                        </div>
+                        <div class="col-md-4>">
+                            <div id="xy_plot"></div>
+                        </div>
+                    </div>
+                    <div id="waveform_info"></div>
+                    <div id="spectrum_info"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 
 {% endblock %}
 
 {% block foot %}
-{{ super() }}
-<script type="text/javascript" src="{{ url_for('static', filename='jslib/d3.v2.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='jslib/dsp.js') }}"></script>
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='jslib/d3.v2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='jslib/dsp.js') }}"></script>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-function updateTrackerInfo() {
-    $.getJSON($SCRIPT_ROOT + '/tracker/info', function (data) {
-        $('#tracker_uptime').text(data['process']['uptime']);
-        $('#tracker_version').html(data['software']['version']);
-        $('#pcb_firmware').text(data['hardware']['firmware']);
-        $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
-        $('#pcb_timer').text(data['hardware']['gps']['ticksPerSecond']);
-        $('#gps_position').text('(' + data['hardware']['gps']['longitude'].toFixed(4) + ", " + data['hardware']['gps']['latitude'].toFixed(4) + ', ' + data['hardware']['gps']['altitude'].toFixed(0) + ')');
-        $('#gps_status').text(data['hardware']['gps']['status']);
-        $('#gps_satelliteCount').text(data['hardware']['gps']['satelliteCount']);
-        $('#gps_hardwareType').text(data['hardware']['gps']['type']);
-        $('#gps_baudRate').text(data['hardware']['gps']['baudRate']);
-        $('#activity_numberofevents').text(data['process']['numberOfEvents']);
-        $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
-    });
-}
-updateTrackerInfo();
-setInterval("updateTrackerInfo()", 10000);
+    function updateTrackerInfo() {
+        $.getJSON($SCRIPT_ROOT + '/tracker/info', function (data) {
+            $('#tracker_uptime').text(data['process']['uptime']);
+            $('#tracker_version').html(data['software']['version']);
+            $('#pcb_firmware').text(data['hardware']['firmware']);
+            $('#pcb_baudrate').text(data['hardware']['comm']['baudRate']);
+            $('#pcb_timer').text(data['hardware']['gps']['ticksPerSecond']);
+            $('#gps_position').text('(' + data['hardware']['gps']['longitude'].toFixed(4) + ", " + data['hardware']['gps']['latitude'].toFixed(4) + ', ' + data['hardware']['gps']['altitude'].toFixed(0) + ')');
+            $('#gps_status').text(data['hardware']['gps']['status']);
+            $('#gps_satelliteCount').text(data['hardware']['gps']['satelliteCount']);
+            $('#gps_hardwareType').text(data['hardware']['gps']['type']);
+            $('#gps_baudRate').text(data['hardware']['gps']['baudRate']);
+            $('#activity_numberofevents').text(data['process']['numberOfEvents']);
+            $('#activity_eventspersecond').text(data['process']['eventsPerSecond']);
+        });
+    }
+    updateTrackerInfo();
+    setInterval("updateTrackerInfo()", 10000);
 
-function updateActivityPlot() {
-    $.getJSON($SCRIPT_ROOT + '/tracker/activity', function (data) {
+    function updateActivityPlot() {
+        $.getJSON($SCRIPT_ROOT + '/tracker/activity', function (data) {
 
-        var totalWidth = 400;
-        var totalHeight = 200;
-        var xAxisHeight = 18;
-        var yAxisWidth = 30;
-        var chartWidth = totalWidth - yAxisWidth;
-        var chartHeight = totalHeight - xAxisHeight;
-        var barWidth = chartWidth / data.length;
+            var totalWidth = 400;
+            var totalHeight = 200;
+            var xAxisHeight = 18;
+            var yAxisWidth = 30;
+            var chartWidth = totalWidth - yAxisWidth;
+            var chartHeight = totalHeight - xAxisHeight;
+            var barWidth = chartWidth / data.length;
 
-        var xScale = d3.scale.linear()
-                .domain([0, data.length * 1.025])
-                .range([0, chartWidth - 1]);
+            var xScale = d3.scale.linear()
+                    .domain([0, data.length * 1.025])
+                    .range([0, chartWidth - 1]);
 
-        var yMaxValue = d3.max(data);
-        var yOffset = yMaxValue * 0.05;
+            var yMaxValue = d3.max(data);
+            var yOffset = yMaxValue * 0.05;
 
-        var yScale = d3.scale.linear()
-                .domain([0, yMaxValue + yOffset])
-                .range([chartHeight - 1, 1]);
+            var yScale = d3.scale.linear()
+                    .domain([0, yMaxValue + yOffset])
+                    .range([chartHeight - 1, 1]);
 
-        $('#activity_range').text('' + data.length)
+            $('#activity_range').text('' + data.length)
 
-        $('#activity_plot').empty();
-        var barChart = d3.select("#activity_plot").
-                append("svg:svg").
-                attr("width", totalWidth).
-                attr("height", totalHeight);
-
-        var dataGroup = barChart.append("svg:g").
-                attr("transform", "translate(" + yAxisWidth + ",0)");
-
-        dataGroup.selectAll("rect").
-                data(data).
-                enter().
-                append("svg:rect").
-                attr("x",function (datum, index) {
-                    return xScale(index);
-                }).
-                attr("y",function (datum, index) {
-                    return yScale(datum);
-                }).
-                attr("height",function (datum, index) {
-                    return yScale(0) - yScale(datum);
-                }).
-                attr("width", barWidth).
-                attr("fill", "#88aaee");
-
-        var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5).tickSize(4, 0, 0)
-        barChart.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + yAxisWidth + ", 0)")
-                .call(yAxis);
-
-        var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5).tickSize(4, 0, 0)
-        barChart.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + yAxisWidth + ", " + yScale(0) + ")")
-                .call(xAxis);
-    });
-}
-updateActivityPlot();
-setInterval("updateActivityPlot()", 60000);
-
-function updateCurrentWaveform() {
-    $.getJSON($SCRIPT_ROOT + '/data/raw/long/-1', function (data) {
-        var eventInfo = data[0];
-        var samplePeriod = eventInfo[5] / 1000;
-        var maxAmplitude = eventInfo[6] / Math.sqrt(2) * 100
-        var phase = eventInfo[7];
-        var maxIndex = eventInfo[8];
-        var waveformData = eventInfo[9];
-
-        $('#waveform_info').text(eventInfo[0] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod / 1000).toFixed(2) + ' us (' + maxIndex + '), ' + (phase / Math.PI * 180).toFixed(1) + '°');
-
-        var xdata = waveformData[0];
-        var ydata = waveformData[1];
-
-        var totalWidth = 400;
-        var totalHeight = 200;
-        var yAxisWidth = 30;
-        var chartWidth = totalWidth - yAxisWidth;
-        var chartHeight = totalHeight;
-
-        var xScale;
-        xScale = d3.scale.linear()
-                .domain([0, xdata.length * samplePeriod])
-                .range([0, chartWidth - 1]);
-        var yScale;
-        yScale = d3.scale.linear()
-                .domain([-1.05, 1.05])
-                .range([chartHeight - 1, 1]);
-
-        $("#waveform_plot").empty();
-        var waveformPlot = d3.select("#waveform_plot")
-                .append("svg:svg")
-                .attr("width", totalWidth)
-                .attr("height", totalHeight);
-
-        var dataGroup = waveformPlot.append("svg:g")
-                .attr("transform", "translate(" + yAxisWidth + ",0)");
-
-        var timeLine = d3.svg.line()
-                .x(function (d, i) {
-                    return xScale(samplePeriod * i);
-                })
-                .y(function (d, i) {
-                    return yScale(d);
-                })
-                .interpolate("linear");
-
-        var cos_phase = Math.cos(-phase);
-        var sin_phase = Math.sin(-phase);
-        var normalizedTimeLine = d3.svg.line().
-                x(function (d, i) {
-                    return xScale(samplePeriod * i);
-                }).
-                y(function (d, i) {
-                    return yScale(xdata[i] * cos_phase - ydata[i] * sin_phase);
-                }).
-                interpolate("linear");
-
-        dataGroup.append("svg:path").
-                attr("d", timeLine(xdata)).
-                style("stroke", "green").
-                style("fill", "none");
-
-        dataGroup.append("svg:path").
-                attr("d", timeLine(ydata)).
-                style("stroke", "red").
-                style("fill", "none");
-
-        dataGroup.append("svg:path").
-                attr("d", normalizedTimeLine(xdata)).
-                style("stroke", "blue").
-                style("fill", "none");
-
-        var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5).tickSize(4, 0, 0)
-        waveformPlot.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + yAxisWidth + ", " + yScale(0) + ")")
-                .call(xAxis);
-
-        var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(3).tickSize(4, 0, 0)
-        waveformPlot.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + yAxisWidth + ", 0)")
-                .call(yAxis);
-
-        var legend = waveformPlot.append("g")
-                .attr("class", "legend")
-                .attr("x", totalWidth - 65)
-                .attr("y", 25)
-                .attr("height", 100)
-                .attr("width", 100);
-
-        var legendData = [
-            ['green', 'x-data'],
-            ['red', 'y-data'],
-            ['blue', 'normalized']
-        ];
-
-        legend.selectAll('g').data(legendData)
-                .enter()
-                .append('g')
-                .each(function (d, i) {
-                    var g = d3.select(this);
-                    g.append("rect")
-                            .attr("x", totalWidth - 65)
-                            .attr("y", 5 + i * 15)
-                            .attr("width", 6)
-                            .attr("height", 6)
-                            .style("fill", d[0]);
-
-                    g.append("text")
-                            .attr("x", totalWidth - 55)
-                            .attr("y", 5 + i * 15 + 6)
-                            .attr("height", 20)
-                            .attr("width", 60)
-                            .style("fill", d[0])
-                            .attr("font-size", "10px")
-                            .text(d[1]);
-
-                });
-
-        chartWidth = totalHeight;
-        chartHeight = totalHeight;
-
-        xScale = d3.scale.linear().domain([-1.05, 1.05]).range([0, chartWidth - 1]);
-        yScale = d3.scale.linear().domain([-1.05, 1.05]).range([chartHeight - 1, 0]);
-
-        $("#xy_plot").empty();
-        var xyPlot = d3.select("#xy_plot").
-                append("svg:svg").
-                attr("width", chartWidth).
-                attr("height", chartHeight);
-
-        var xyPhaseGroup = xyPlot.append("svg:g");
-        xyPhaseGroup.append("svg:line").
-                attr("x1", xScale(cos_phase)).
-                attr("y1", yScale(-sin_phase)).
-                attr("x2", xScale(-cos_phase)).
-                attr("y2", yScale(sin_phase)).
-                style("stroke", "gray").
-                style("stroke-dasharray", "5 5").
-                style("fill", "none");
-
-        var xyDataGroup = xyPlot.append("svg:g");
-
-        var xyLine = d3.svg.line().
-                x(function (d) {
-                    return xScale(d);
-                }).
-                y(function (d, i) {
-                    return yScale(ydata[i]);
-                }).
-                interpolate("linear");
-
-        xyDataGroup.append("svg:path").
-                attr("d", xyLine(xdata)).
-                style("stroke", "blue").
-                style("fill", "none");
-
-        var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
-        xyPlot.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(0, " + yScale(0) + ")")
-                .call(xAxis);
-
-        var yAxis = d3.svg.axis().scale(yScale).orient("right").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
-        xyPlot.append("svg:g")
-                .attr("class", "axis")
-                .attr("transform", "translate(" + xScale(0) + ", 0)")
-                .call(yAxis);
-
-        var width = totalWidth - yAxisWidth;
-        var height = totalHeight;
-
-        var xScale = d3.scale.linear().domain([0, xdata.length / samplePeriod]).range([0, width - 1]);
-        var yScale = d3.scale.linear().domain([0, 1]).range([height - 1, 0]);
-
-        $("#spectrum_plot").empty();
-        var waveformPlot = d3.select("#spectrum_plot").
-                append("svg:svg").
-                attr("width", totalWidth).
-                attr("height", totalHeight);
-
-        var dataGroup = waveformPlot.append("svg:g").
-                attr("transform", "translate(" + yAxisWidth + ",0)");
-
-        var timeLine = d3.svg.line().
-                x(function (d, i) {
-                    return xScale(samplePeriod * i);
-                }).
-                y(function (d, i) {
-                    return yScale(d);
-                }).
-                interpolate("linear");
-
-        var cos_phase = Math.cos(-phase);
-        var sin_phase = Math.sin(-phase);
-        var normalizedTimeLine = d3.svg.line().
-                x(function (d, i) {
-                    return xScale(samplePeriod * i);
-                }).
-                y(function (d, i) {
-                    return yScale(xdata[i] * cos_phase - ydata[i] * sin_phase);
-                }).
-                interpolate("linear");
-
-        dataGroup.append("svg:path").
-                attr("d", timeLine(xdata)).
-                style("stroke", "green").
-                style("fill", "none");
-
-        dataGroup.append("svg:path").
-                attr("d", timeLine(ydata)).
-                style("stroke", "red").
-                style("fill", "none");
-
-        dataGroup.append("svg:path").
-                attr("d", normalizedTimeLine(xdata)).
-                style("stroke", "blue").
-                style("fill", "none");
-
-    });
-}
-updateCurrentWaveform();
-setInterval("updateCurrentWaveform()", 2000);
-
-</script>
-
-<script type="text/javascript">
-
-    $('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}"/>');
-
-    function updateAmplitudeDirectionPlot() {
-        $.getJSON($SCRIPT_ROOT + '/data/raw/time/-60', function (result) {
-
-            var data;
-            data = [];
-
-            $.each(result, function (index, event) {
-                var maxAmplitude = event[6];
-                var phase = event[7];
-                var value = new Object();
-                value.x = maxAmplitude * Math.cos(phase);
-                value.y = maxAmplitude * Math.sin(phase);
-                data.push(value);
-            });
-
-            var width = 300;
-            var height = 300;
-
-            var xScale = d3.scale.linear().domain([-1.05, 1.05]).range([0, width - 1]);
-            var yScale = d3.scale.linear().domain([-1.05, 1.05]).range([height - 1, 0]);
-
-            $('#amplitude_direction_plot').empty();
-
-            var polarPlot = d3.select("#amplitude_direction_plot").
+            $('#activity_plot').empty();
+            var barChart = d3.select("#activity_plot").
                     append("svg:svg").
-                    attr("width", width).
-                    attr("height", height);
+                    attr("width", totalWidth).
+                    attr("height", totalHeight);
 
-            var dataGroup = polarPlot.append("svg:g");
-            dataGroup.selectAll("path.dot").
+            var dataGroup = barChart.append("svg:g").
+                    attr("transform", "translate(" + yAxisWidth + ",0)");
+
+            dataGroup.selectAll("rect").
                     data(data).
                     enter().
-                    append("svn:path").
-                    attr("class", "dot").
-                    attr("stroke", "none").
-                    attr("fill", "green").
-                    attr("transform",function (d) {
-                        return "translate(" + xScale(d.x) + ", " + yScale(d.y) + ")";
+                    append("svg:rect").
+                    attr("x", function (datum, index) {
+                        return xScale(index);
                     }).
-                    attr("d", d3.svg.symbol().type("cross").size(15));
+                    attr("y", function (datum, index) {
+                        return yScale(datum);
+                    }).
+                    attr("height", function (datum, index) {
+                        return yScale(0) - yScale(datum);
+                    }).
+                    attr("width", barWidth).
+                    attr("fill", "#88aaee");
+
+            var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(5).tickSize(4, 0, 0)
+            barChart.append("svg:g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisWidth + ", 0)")
+                    .call(yAxis);
+
+            var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5).tickSize(4, 0, 0)
+            barChart.append("svg:g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisWidth + ", " + yScale(0) + ")")
+                    .call(xAxis);
+        });
+    }
+    updateActivityPlot();
+    setInterval("updateActivityPlot()", 60000);
+
+    function updateCurrentWaveform() {
+        $.getJSON($SCRIPT_ROOT + '/data/raw/long/-1', function (data) {
+            var eventInfo = data[0];
+            var samplePeriod = eventInfo[5] / 1000;
+            var maxAmplitude = eventInfo[6] / Math.sqrt(2) * 100
+            var phase = eventInfo[7];
+            var maxIndex = eventInfo[8];
+            var waveformData = eventInfo[9];
+
+            $('#waveform_info').text(eventInfo[0] + ", peak " + maxAmplitude.toFixed(1) + '% @ ' + (maxIndex * samplePeriod / 1000).toFixed(2) + ' us (' + maxIndex + '), ' + (phase / Math.PI * 180).toFixed(1) + '°');
+
+            var xdata = waveformData[0];
+            var ydata = waveformData[1];
+
+            var totalWidth = 400;
+            var totalHeight = 200;
+            var yAxisWidth = 30;
+            var chartWidth = totalWidth - yAxisWidth;
+            var chartHeight = totalHeight;
+
+            var xScale;
+            xScale = d3.scale.linear()
+                    .domain([0, xdata.length * samplePeriod])
+                    .range([0, chartWidth - 1]);
+            var yScale;
+            yScale = d3.scale.linear()
+                    .domain([-1.05, 1.05])
+                    .range([chartHeight - 1, 1]);
+
+            $("#waveform_plot").empty();
+            var waveformPlot = d3.select("#waveform_plot")
+                    .append("svg:svg")
+                    .attr("width", totalWidth)
+                    .attr("height", totalHeight);
+
+            var dataGroup = waveformPlot.append("svg:g")
+                    .attr("transform", "translate(" + yAxisWidth + ",0)");
+
+            var timeLine = d3.svg.line()
+                    .x(function (d, i) {
+                        return xScale(samplePeriod * i);
+                    })
+                    .y(function (d, i) {
+                        return yScale(d);
+                    })
+                    .interpolate("linear");
+
+            var cos_phase = Math.cos(-phase);
+            var sin_phase = Math.sin(-phase);
+            var normalizedTimeLine = d3.svg.line().
+                    x(function (d, i) {
+                        return xScale(samplePeriod * i);
+                    }).
+                    y(function (d, i) {
+                        return yScale(xdata[i] * cos_phase - ydata[i] * sin_phase);
+                    }).
+                    interpolate("linear");
+
+            dataGroup.append("svg:path").
+                    attr("d", timeLine(xdata)).
+                    style("stroke", "green").
+                    style("fill", "none");
+
+            dataGroup.append("svg:path").
+                    attr("d", timeLine(ydata)).
+                    style("stroke", "red").
+                    style("fill", "none");
+
+            dataGroup.append("svg:path").
+                    attr("d", normalizedTimeLine(xdata)).
+                    style("stroke", "blue").
+                    style("fill", "none");
+
+            var xAxis = d3.svg.axis().scale(xScale).orient("bottom").ticks(5).tickSize(4, 0, 0)
+            waveformPlot.append("svg:g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisWidth + ", " + yScale(0) + ")")
+                    .call(xAxis);
+
+            var yAxis = d3.svg.axis().scale(yScale).orient("left").ticks(3).tickSize(4, 0, 0)
+            waveformPlot.append("svg:g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + yAxisWidth + ", 0)")
+                    .call(yAxis);
+
+            var legend = waveformPlot.append("g")
+                    .attr("class", "legend")
+                    .attr("x", totalWidth - 65)
+                    .attr("y", 25)
+                    .attr("height", 100)
+                    .attr("width", 100);
+
+            var legendData = [
+                ['green', 'x-data'],
+                ['red', 'y-data'],
+                ['blue', 'normalized']
+            ];
+
+            legend.selectAll('g').data(legendData)
+                    .enter()
+                    .append('g')
+                    .each(function (d, i) {
+                        var g = d3.select(this);
+                        g.append("rect")
+                                .attr("x", totalWidth - 65)
+                                .attr("y", 5 + i * 15)
+                                .attr("width", 6)
+                                .attr("height", 6)
+                                .style("fill", d[0]);
+
+                        g.append("text")
+                                .attr("x", totalWidth - 55)
+                                .attr("y", 5 + i * 15 + 6)
+                                .attr("height", 20)
+                                .attr("width", 60)
+                                .style("fill", d[0])
+                                .attr("font-size", "10px")
+                                .text(d[1]);
+
+                    });
+
+            chartWidth = totalHeight;
+            chartHeight = totalHeight;
+
+            xScale = d3.scale.linear().domain([-1.05, 1.05]).range([0, chartWidth - 1]);
+            yScale = d3.scale.linear().domain([-1.05, 1.05]).range([chartHeight - 1, 0]);
+
+            $("#xy_plot").empty();
+            var xyPlot = d3.select("#xy_plot").
+                    append("svg:svg").
+                    attr("width", chartWidth).
+                    attr("height", chartHeight);
+
+            var xyPhaseGroup = xyPlot.append("svg:g");
+            xyPhaseGroup.append("svg:line").
+                    attr("x1", xScale(cos_phase)).
+                    attr("y1", yScale(-sin_phase)).
+                    attr("x2", xScale(-cos_phase)).
+                    attr("y2", yScale(sin_phase)).
+                    style("stroke", "gray").
+                    style("stroke-dasharray", "5 5").
+                    style("fill", "none");
+
+            var xyDataGroup = xyPlot.append("svg:g");
+
+            var xyLine = d3.svg.line().
+                    x(function (d) {
+                        return xScale(d);
+                    }).
+                    y(function (d, i) {
+                        return yScale(ydata[i]);
+                    }).
+                    interpolate("linear");
+
+            xyDataGroup.append("svg:path").
+                    attr("d", xyLine(xdata)).
+                    style("stroke", "blue").
+                    style("fill", "none");
 
             var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
-            polarPlot.append("svg:g")
+            xyPlot.append("svg:g")
                     .attr("class", "axis")
                     .attr("transform", "translate(0, " + yScale(0) + ")")
                     .call(xAxis);
 
             var yAxis = d3.svg.axis().scale(yScale).orient("right").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
-            polarPlot.append("svg:g")
+            xyPlot.append("svg:g")
                     .attr("class", "axis")
                     .attr("transform", "translate(" + xScale(0) + ", 0)")
                     .call(yAxis);
 
+            var width = totalWidth - yAxisWidth;
+            var height = totalHeight;
+
+            var xScale = d3.scale.linear().domain([0, xdata.length / samplePeriod]).range([0, width - 1]);
+            var yScale = d3.scale.linear().domain([0, 1]).range([height - 1, 0]);
+
+            $("#spectrum_plot").empty();
+            var waveformPlot = d3.select("#spectrum_plot").
+                    append("svg:svg").
+                    attr("width", totalWidth).
+                    attr("height", totalHeight);
+
+            var dataGroup = waveformPlot.append("svg:g").
+                    attr("transform", "translate(" + yAxisWidth + ",0)");
+
+            var timeLine = d3.svg.line().
+                    x(function (d, i) {
+                        return xScale(samplePeriod * i);
+                    }).
+                    y(function (d, i) {
+                        return yScale(d);
+                    }).
+                    interpolate("linear");
+
+            var cos_phase = Math.cos(-phase);
+            var sin_phase = Math.sin(-phase);
+            var normalizedTimeLine = d3.svg.line().
+                    x(function (d, i) {
+                        return xScale(samplePeriod * i);
+                    }).
+                    y(function (d, i) {
+                        return yScale(xdata[i] * cos_phase - ydata[i] * sin_phase);
+                    }).
+                    interpolate("linear");
+
+            dataGroup.append("svg:path").
+                    attr("d", timeLine(xdata)).
+                    style("stroke", "green").
+                    style("fill", "none");
+
+            dataGroup.append("svg:path").
+                    attr("d", timeLine(ydata)).
+                    style("stroke", "red").
+                    style("fill", "none");
+
+            dataGroup.append("svg:path").
+                    attr("d", normalizedTimeLine(xdata)).
+                    style("stroke", "blue").
+                    style("fill", "none");
+
         });
     }
-    updateAmplitudeDirectionPlot();
-    setInterval("updateAmplitudeDirectionPlot()", 300000);
-</script>
+    updateCurrentWaveform();
+    setInterval("updateCurrentWaveform()", 2000);
+
+    </script>
+
+    <script type="text/javascript">
+
+        $('#amplitude_direction_plot').empty().html('<img src="{{url_for('static', filename='loader.gif')}}"/>');
+
+        function updateAmplitudeDirectionPlot() {
+            $.getJSON($SCRIPT_ROOT + '/data/raw/time/-60', function (result) {
+
+                var data;
+                data = [];
+
+                $.each(result, function (index, event) {
+                    var maxAmplitude = event[6];
+                    var phase = event[7];
+                    var value = new Object();
+                    value.x = maxAmplitude * Math.cos(phase);
+                    value.y = maxAmplitude * Math.sin(phase);
+                    data.push(value);
+                });
+
+                var width = 300;
+                var height = 300;
+
+                var xScale = d3.scale.linear().domain([-1.05, 1.05]).range([0, width - 1]);
+                var yScale = d3.scale.linear().domain([-1.05, 1.05]).range([height - 1, 0]);
+
+                $('#amplitude_direction_plot').empty();
+
+                var polarPlot = d3.select("#amplitude_direction_plot").
+                        append("svg:svg").
+                        attr("width", width).
+                        attr("height", height);
+
+                var dataGroup = polarPlot.append("svg:g");
+                dataGroup.selectAll("path.dot").
+                        data(data).
+                        enter().
+                        append("svn:path").
+                        attr("class", "dot").
+                        attr("stroke", "none").
+                        attr("fill", "green").
+                        attr("transform", function (d) {
+                            return "translate(" + xScale(d.x) + ", " + yScale(d.y) + ")";
+                        }).
+                        attr("d", d3.svg.symbol().type("cross").size(15));
+
+                var xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
+                polarPlot.append("svg:g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0, " + yScale(0) + ")")
+                        .call(xAxis);
+
+                var yAxis = d3.svg.axis().scale(yScale).orient("right").tickValues([-1, 1]).tickSize(4, 0, 0).tickFormat(d3.format("d"))
+                polarPlot.append("svg:g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + xScale(0) + ", 0)")
+                        .call(yAxis);
+
+            });
+        }
+        updateAmplitudeDirectionPlot();
+        setInterval("updateAmplitudeDirectionPlot()", 300000);
+    </script>
 
 {% endblock %}
