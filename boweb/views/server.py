@@ -41,7 +41,7 @@ def get_strikes_data():
 
     current_time = datetime.datetime.utcnow().replace(tzinfo=pytz.UTC)
 
-    strikes = strike_db.select(TimeInterval(current_time - datetime.timedelta(minutes=60)))
+    strikes = strike_db.select(time_interval=TimeInterval(current_time - datetime.timedelta(minutes=60)))
 
     features = [
         {
@@ -75,7 +75,7 @@ def get_clusters_data():
         current_time = last_cluster_time
 
     interval_duration = datetime.timedelta(minutes=10)
-    clusters = cluster_db.select(current_time, interval_duration, 6, interval_duration)
+    clusters = cluster_db.select(current_time, interval_duration, 60, datetime.timedelta(minutes=1))
 
     features = [
         {
