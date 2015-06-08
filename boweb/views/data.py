@@ -4,6 +4,7 @@ import subprocess
 from flask import Blueprint, render_template, current_app, jsonify
 
 import blitzortung
+import boweb
 
 
 DATA = Blueprint('data', __name__, url_prefix='/data')
@@ -134,7 +135,7 @@ def get_raw_files():
 
     if not raw_files:
         raw_data_path = '/var/cache/blitzortung/raw'
-        raw_files = blitzortung.files.Raw(raw_data_path)
+        raw_files = boweb.lib.files.Raw(raw_data_path)
         cache.set(cache_item, raw_files, timeout=300)
 
     return raw_files

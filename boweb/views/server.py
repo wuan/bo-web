@@ -8,7 +8,12 @@ except ImportError:
 
 from flask import Blueprint, render_template
 
-import blitzortung.db
+try:
+    from blitzortung.db import strike, strike_cluster
+except ImportError:
+    strike = lambda : None
+    strike_cluster = lambda : None
+
 import pytz
 import boweb
 try:
@@ -34,7 +39,7 @@ def get_server_status():
 
 @SERVER.route('/data/strikes')
 def get_strikes_data():
-    strike_db = blitzortung.db.strike()
+    strike_db = strike()
     strike_db.set_srid(3857)
 
     interval_duration = datetime.timedelta(minutes=10)
@@ -60,7 +65,7 @@ def get_strikes_data():
 
 @SERVER.route('/data/clusters')
 def get_clusters_data():
-    cluster_db = blitzortung.db.strike_cluster()
+    cluster_db = strike_cluster()
     cluster_db.set_srid(3857)
 
     last_cluster_time = cluster_db.get_latest_time()

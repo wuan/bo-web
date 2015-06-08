@@ -2,7 +2,6 @@ import json
 
 from flask import Blueprint, render_template
 
-import blitzortung.db
 import boweb
 
 
